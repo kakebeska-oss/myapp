@@ -1,1 +1,271 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Byrat Shop</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+  body {
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    color: white;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+  @keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  .particle {
+    position: fixed;
+    width: 8px; height: 8px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 50%;
+    animation: float 10s infinite linear;
+    pointer-events: none;
+  }
+  @keyframes float {
+    from { transform: translateY(100vh) scale(0); opacity: 0; }
+    50% { opacity: 1; }
+    to { transform: translateY(-10vh) scale(1); opacity: 0; }
+  }
+  .screen { padding: 30px 20px; min-height: 100vh; display: none; flex-direction: column; }
+  .screen.active { display: flex; }
+  h1 { font-weight: 900; font-size: 28px; text-align: center; margin-bottom: 20px; text-shadow: 0 0 20px rgba(120,120,255,0.7); }
+  h2 { font-weight: 700; font-size: 22px; text-align: center; margin-bottom: 15px; }
+  .btn {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    padding: 16px 24px;
+    font-size: 18px;
+    font-weight: 700;
+    border-radius: 16px;
+    margin: 8px 0;
+    cursor: pointer;
+    box-shadow: 0 8px 25px rgba(102,126,234,0.5);
+    transition: transform 0.15s;
+  }
+  .btn:active { transform: scale(0.96); }
+  .btn-center {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 22px 60px;
+    font-size: 24px;
+  }
+  .btn-exit {
+    position: fixed;
+    bottom: 20px; left: 20px;
+    background: rgba(255,60,60,0.85);
+    padding: 12px 20px;
+    font-size: 15px;
+    box-shadow: 0 6px 20px rgba(255,60,60,0.5);
+  }
+  .btn-back {
+    background: rgba(255,255,255,0.15);
+    margin-top: 20px;
+    font-size: 15px;
+  }
+  .menu { margin-top: 20px; display: flex; flex-direction: column; }
+  .balance-box {
+    background: rgba(255,255,255,0.1);
+    padding: 25px;
+    border-radius: 20px;
+    text-align: center;
+    margin: 20px 0;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .balance-num { font-size: 48px; font-weight: 900; color: #ffd700; text-shadow: 0 0 25px rgba(255,215,0,0.7); }
+  .item {
+    background: rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 16px;
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+  .item-left { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 16px; }
+  .flag { font-size: 28px; }
+  .price { color: #ffd700; font-size: 14px; font-weight: 700; }
+  .btn-buy {
+    background: linear-gradient(135deg, #11998e, #38ef7d);
+    padding: 10px 18px;
+    font-size: 14px;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(56,239,125,0.4);
+  }
+  .checkmark {
+    display: none;
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: rgba(56,239,125,0.2);
+    border: 4px solid #38ef7d;
+    align-items: center;
+    justify-content: center;
+    font-size: 60px;
+    animation: pop 0.5s forwards;
+    z-index: 999;
+  }
+  @keyframes pop {
+    to { transform: translate(-50%, -50%) scale(1); }
+  }
+  .toast {
+    position: fixed;
+    top: 30px; left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    background: rgba(0,0,0,0.85);
+    padding: 15px 25px;
+    border-radius: 14px;
+    font-weight: 700;
+    transition: transform 0.3s;
+    z-index: 1000;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  a { color: #7ec8ff; font-weight: 700; text-decoration: none; }
+</style>
+</head>
+<body>
 
+<div class="particle" style="left:10%; animation-delay:0s;"></div>
+<div class="particle" style="left:30%; animation-delay:2s;"></div>
+<div class="particle" style="left:50%; animation-delay:4s;"></div>
+<div class="particle" style="left:70%; animation-delay:1s;"></div>
+<div class="particle" style="left:90%; animation-delay:3s;"></div>
+
+<!-- ЭКРАН 1: ГЛАВНЫЙ -->
+<div id="screen-main" class="screen active">
+  <h1>Byrat Shop</h1>
+  <button class="btn btn-center" onclick="showScreen('screen-menu')">СТАРТ</button>
+  <button class="btn btn-exit" onclick="Telegram.WebApp.close()">← Выйти</button>
+</div>
+
+<!-- ЭКРАН 2: МЕНЮ -->
+<div id="screen-menu" class="screen">
+  <h1>Меню</h1>
+  <div class="menu">
+    <button class="btn" onclick="showScreen('screen-balance')">💰 Баланс</button>
+    <button class="btn" onclick="showScreen('screen-shop')">🛒 Купить</button>
+    <button class="btn" onclick="showScreen('screen-help')">❓ Помощь</button>
+    <button class="btn btn-back" onclick="showScreen('screen-main')">← Назад</button>
+  </div>
+</div>
+
+<!-- ЭКРАН 3: БАЛАНС -->
+<div id="screen-balance" class="screen">
+  <h1>💰 Баланс</h1>
+  <div class="balance-box">
+    <div class="balance-num" id="balance-display">0</div>
+    <div>⭐ Звёзд</div>
+  </div>
+  <button class="btn" onclick="topUp()">➕ Пополнить</button>
+  <button class="btn btn-back" onclick="showScreen('screen-menu')">← Назад</button>
+</div>
+
+<!-- ЭКРАН 4: МАГАЗИН -->
+<div id="screen-shop" class="screen">
+  <h1>🛒 Доступные аккаунты:</h1>
+
+  <div class="item">
+    <div class="item-left">
+      <span class="flag">🇺🇸</span>
+      <div>США +1<br><span class="price">100 ⭐</span></div>
+    </div>
+    <button class="btn btn-buy" onclick="buy(100)">Купить</button>
+  </div>
+
+  <div class="item">
+    <div class="item-left">
+      <span class="flag">🇨🇦</span>
+      <div>Канада +1<br><span class="price">100 ⭐</span></div>
+    </div>
+    <button class="btn btn-buy" onclick="buy(100)">Купить</button>
+  </div>
+
+  <div class="item">
+    <div class="item-left">
+      <span class="flag">🇲🇲</span>
+      <div>Мьянма +95<br><span class="price">120 ⭐</span></div>
+    </div>
+    <button class="btn btn-buy" onclick="buy(120)">Купить</button>
+  </div>
+
+  <button class="btn btn-back" onclick="showScreen('screen-menu')">← Назад</button>
+</div>
+
+<!-- ЭКРАН 5: ПОМОЩЬ -->
+<div id="screen-help" class="screen">
+  <h1>❓ Помощь</h1>
+  <p style="text-align:center; margin: 20px 0; font-size: 16px;">
+    По всем вопросам пишите в техподдержку:
+  </p>
+  <p style="text-align:center; font-size: 20px;">
+    <a href="https://t.me/ownerByrat_Shop" target="_blank">@ownerByrat_Shop</a>
+  </p>
+  <button class="btn btn-back" onclick="showScreen('screen-menu')">← Назад</button>
+</div>
+
+<!-- ГАЛОЧКА -->
+<div class="checkmark" id="checkmark">✓</div>
+<!-- ТОСТ -->
+<div class="toast" id="toast"></div>
+
+<script>
+  Telegram.WebApp.ready();
+  Telegram.WebApp.expand();
+
+  let balance = parseInt(localStorage.getItem('balance') || '0');
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    if (id === 'screen-balance') updateBalance();
+  }
+
+  function updateBalance() {
+    document.getElementById('balance-display').textContent = balance;
+  }
+
+  function showToast(text) {
+    const t = document.getElementById('toast');
+    t.textContent = text;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  function topUp() {
+    showToast('Оплата звёздами скоро появится');
+  }
+
+  function buy(price) {
+    if (balance >= price) {
+      balance -= price;
+      localStorage.setItem('balance', balance);
+      updateBalance();
+
+      const check = document.getElementById('checkmark');
+      check.style.display = 'flex';
+      setTimeout(() => {
+        check.style.display = 'none';
+        showToast('Транзакция произведена успешно!');
+      }, 1200);
+    } else {
+      showToast('Недостаточно звёзд на балансе');
+    }
+  }
+
+  updateBalance();
+</script>
+</body>
+</html>
