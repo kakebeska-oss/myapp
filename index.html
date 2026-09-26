@@ -1,0 +1,295 @@
+export default {
+  async fetch(request, env, ctx) {
+    const BOT_TOKEN = env.ENV_BOT_TOKEN;
+    const API_URL = `https://api.telegram.org/bot${BOT_TOKEN}`;
+    const WEBAPP_URL = "https://kakebeska-oss.github.io/myapp/";
+    const ADMIN_ID = 8797313612;
+    const EDITOR_FILE_ID = "BQACAgEAAxkBAAIDSmq254_6ZjWuELc7f89gXRW1UETGAAKVCQAC8aexRafw514jrnEDPQQ";
+
+    const url = new URL(request.url);
+
+    // ==================== API ДЛЯ MINI APP ====================
+
+    if (url.pathname === "/api/balance") {
+      const userId = url.searchParams.get("user_id");
+      if (!userId) {
+        return new Response(JSON.stringify({ balance: 0 }), {
+          headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+        });
+      }
+      const bal = parseInt(await env.USERS_KV.get("balance_" + userId) || "0");
+      return new Response(JSON.stringify({ balance: bal }), {
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+      });
+    }
+
+    if (url.pathname === "/api/buy") {
+      const userId = url.searchParams.get("user_id");
+      const country = url.searchParams.get("country");
+      if (!userId || !country) {
+        return new Response(JSON.stringify({ ok: false, message: "Неверные параметры" }), {
+          headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+        });
+      }
+      const result = await buyAccount(env, userId, country);
+      if (result.ok) {
+        await sendMessage(userId, result.message);
+      }
+      return new Response(JSON.stringify(result), {
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+      });
+    }
+
+    if (url.pathname === "/api/promo") {
+      const userId = url.searchParams.get("user_id");
+      const code = url.searchParams.get("code");
+      if (!userId || !code) {
+        return new Response(JSON.stringify({ ok: false, message: "Введи промокод" }), {
+          headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+        });
+      }
+      const result = await activatePromo(env, userId, code);
+      return new Response(JSON.stringify(result), {
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+      });
+    }
+
+    // ==================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ====================
+
+    async function sendMessage(chatId, text, keyboard = null) {
+      const body = { chat_id: chatId, text: text };
+      if (keyboard) body.reply_markup = keyboard;
+      await fetch(`${API_URL}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+    }
+
+    async function sendInvoice(chatId, starsAmount, payload) {
+      await fetch(`${API_URL}/sendInvoice`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          title: "Пополнение баланса",
+          description: `Пополнение на ${starsAmount} ⭐`,
+          payload: payload || ("topup_" + chatId + "_" + Date.now()),
+          currency: "XTR",
+          prices: [{ label: "Звёзды", amount: starsAmount }]
+        })
+      });
+    }
+
+    async function addBalance(env, userId, amount) {
+      const key = "balance_" + userId;
+      const current = parseInt(await env.USERS_KV.get(key) || "0");
+      await env.USERS_KV.put(key, String(current + amount));
+    }
+
+    async function getBalance(env, userId) {
+      return parseInt(await env.USERS_KV.get("balance_" + userId) || "0");
+    }
+
+    async function activatePromo(env, userId, code) {
+      const upperCode = code.trim().toUpperCase();
+      const promos = { "VERASHAVKA": 100, "TEST1000": 1000 };
+      if (!promos[upperCode]) return { ok: false, message: "Неверный промокод" };
+
+      const usedKey = "promo_" + upperCode + "_" + userId;
+      const alreadyUsed = await env.USERS_KV.get(usedKey);
+      if (alreadyUsed) return { ok: false, message: "Ты уже использовал этот промокод" };
+
+      await env.USERS_KV.put(usedKey, "1");
+      await addBalance(env, userId, promos[upperCode]);
+      return { ok: true, message: `✅ Промокод активирован!\n\n+${promos[upperCode]} ⭐ на баланс` };
+    }
+
+    async function buyAccount(env, userId, country) {
+      const prices = { "usa": 100, "canada": 100, "myanmar": 120 };
+      const price = prices[country];
+      if (!price) return { ok: false, message: "Неизвестная страна" };
+
+      const balance = await getBalance(env, userId);
+      if (balance < price) return { ok: false, message: "Недостаточно звёзд на балансе" };
+
+      await addBalance(env, userId, -price);
+      const countKey = "sold_" + country;
+      const sold = parseInt(await env.USERS_KV.get(countKey) || "0");
+      const accountNumber = sold + 1;
+
+      if (accountNumber > 10) {
+        await addBalance(env, userId, price);
+        return { ok: false, message: "Товар закончился" };
+      }
+
+      await env.USERS_KV.put(countKey, String(accountNumber));
+      const names = { "usa": "Америка", "canada": "Канада", "myanmar": "Мьянма" };
+      return { ok: true, message: `✅ Успешно!\n\nТвой аккаунт: ${names[country]} ${accountNumber}` };
+    }
+
+    async function buyCfg(env, userId) {
+      const price = 150;
+      const balance = await getBalance(env, userId);
+
+      if (balance < price) {
+        await sendMessage(
+          userId,
+          `❌ Недостаточно звёзд на балансе.\n\n` +
+          `Стоимость CFG-сетки: ${price} ⭐\n` +
+          `Твой баланс: ${balance} ⭐\n\n` +
+          `Пополни баланс: ➕ Пополнить`
+        );
+        return;
+      }
+
+      await addBalance(env, userId, -price);
+
+      const caption =
+        `✅ Списано ${price} ⭐ с баланса!\n\n` +
+        `🎮 Держи редактор сеток (HTML-файл).\n\n` +
+        `📌 Как пользоваться:\n` +
+        `1. Скачай файл\n` +
+        `2. Открой его в браузере (Chrome)\n` +
+        `3. Загрузи фото (кнопка «Арт»)\n` +
+        `4. Настрой плотность, контраст, символы\n` +
+        `5. Нажми «Скачать .JSON»\n` +
+        `6. Закинь файл в: Steam\\userdata\\<ТВОЙ_ID>\\570\\remote\\cfg\n` +
+        `7. Перезапусти Dota 2\n\n` +
+        `⚠️ Сделай бэкап старого hero_grid_config.json!`;
+
+      await fetch(`${API_URL}/sendDocument`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: userId,
+          document: EDITOR_FILE_ID,
+          caption: caption
+        })
+      });
+    }
+
+    // ==================== TELEGRAM WEBHOOK ====================
+
+    const body = await request.text();
+    if (!body) return new Response('OK', { status: 200 });
+
+    try {
+      const update = JSON.parse(body);
+
+      if (update.pre_checkout_query) {
+        await fetch(`${API_URL}/answerPreCheckoutQuery`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pre_checkout_query_id: update.pre_checkout_query.id, ok: true })
+        });
+        return new Response('OK', { status: 200 });
+      }
+
+      if (update.message && update.message.successful_payment) {
+        const chatId = update.message.chat.id;
+        const stars = update.message.successful_payment.total_amount;
+        await addBalance(env, chatId, stars);
+        await sendMessage(chatId, `✅ Зачислено ${stars} ⭐ на баланс!\n\nПроверить: /balance`);
+        return new Response('OK', { status: 200 });
+      }
+
+      if (update.message && update.message.web_app_data) {
+        const chatId = update.message.chat.id;
+        const data = update.message.web_app_data.data;
+
+        if (data.startsWith("pay_")) {
+          const amount = parseInt(data.split("_")[1]);
+          await sendInvoice(chatId, amount, "topup_" + chatId + "_" + Date.now());
+        }
+        if (data.startsWith("buy_")) {
+          const country = data.replace("buy_", "");
+          const result = await buyAccount(env, chatId, country);
+          await sendMessage(chatId, result.message);
+        }
+        if (data === "cfg_order") {
+          await buyCfg(env, chatId);
+        }
+        return new Response('OK', { status: 200 });
+      }
+
+      if (update.callback_query) {
+        const cb = update.callback_query;
+        const chatId = cb.message.chat.id;
+        const data = cb.data;
+
+        await fetch(`${API_URL}/answerCallbackQuery`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ callback_query_id: cb.id })
+        });
+
+        if (data.startsWith("pay_")) {
+          const amount = parseInt(data.split("_")[1]);
+          await sendInvoice(chatId, amount, "topup_" + chatId + "_" + Date.now());
+        }
+        return new Response('OK', { status: 200 });
+      }
+
+      if (update.message && update.message.text) {
+        const chatId = update.message.chat.id;
+        const text = update.message.text.trim();
+
+        const replyKeyboard = {
+          keyboard: [
+            [{ text: "🛒 Магазин", web_app: { url: WEBAPP_URL + "?user_id=" + chatId } }],
+            [{ text: "💰 Баланс" }, { text: "➕ Пополнить" }],
+            [{ text: "🎁 Промокод" }, { text: "❓ Помощь" }],
+            [{ text: "⭐ Отзывы" }, { text: "📢 Канал" }],
+          ],
+          resize_keyboard: true,
+        };
+
+        if (text === '/balance' || text === "💰 Баланс") {
+          const bal = await getBalance(env, chatId);
+          await sendMessage(chatId, `💰 Твой баланс: ${bal} ⭐`, replyKeyboard);
+        }
+        else if (text === '/start') {
+          await sendMessage(chatId, "Добро пожаловать! Нажми «🛒 Магазин» внизу.", replyKeyboard);
+        }
+        else if (text === "➕ Пополнить") {
+          const inlineKeyboard = {
+            inline_keyboard: [
+              [{ text: "10 ⭐", callback_data: "pay_10" }, { text: "20 ⭐", callback_data: "pay_20" }, { text: "50 ⭐", callback_data: "pay_50" }],
+              [{ text: "100 ⭐", callback_data: "pay_100" }, { text: "150 ⭐", callback_data: "pay_150" }, { text: "300 ⭐", callback_data: "pay_300" }]
+            ]
+          };
+          await sendMessage(chatId, "Выбери сумму 👇", inlineKeyboard);
+        }
+        else if (text === "🎁 Промокод") {
+          await sendMessage(chatId, "🎁 Введи промокод:\n/promo ТВОЙКОД\n\nПример: /promo sosiska2026", replyKeyboard);
+        }
+        else if (text.startsWith('/promo')) {
+          const parts = text.split(' ');
+          if (parts.length < 2 || !parts[1]) {
+            await sendMessage(chatId, "❌ Напиши код.\nПример: /promo sosiska2026", replyKeyboard);
+          } else {
+            const result = await activatePromo(env, chatId, parts[1]);
+            await sendMessage(chatId, result.message, replyKeyboard);
+          }
+        }
+        else if (text === "❓ Помощь") {
+          await sendMessage(chatId, "❓ @ownerByrat_Shop", replyKeyboard);
+        }
+        else if (text === "⭐ Отзывы") {
+          await sendMessage(chatId, "⭐ Отзывы: https://t.me/OtziviByratShop");
+        }
+        else if (text === "📢 Канал") {
+          await sendMessage(chatId, "📢 Канал: https://t.me/ByratShop");
+        }
+        else {
+          await sendMessage(chatId, "Напиши /start.", replyKeyboard);
+        }
+      }
+
+      return new Response('OK', { status: 200 });
+    } catch (e) {
+      return new Response('Error: ' + e.message, { status: 500 });
+    }
+  },
+};
