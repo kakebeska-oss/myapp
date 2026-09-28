@@ -11,142 +11,55 @@
   html, body { width: 100%; overflow-x: hidden; background: var(--bg); }
   body { font-family: -apple-system, sans-serif; color: var(--text); min-height: 100vh; display: flex; flex-direction: column; position: relative; }
   body::before { content: ""; position: fixed; inset: 0; background: radial-gradient(circle at 20% 10%, rgba(255,45,45,0.25), transparent 35%), radial-gradient(circle at 80% 90%, rgba(255,45,45,0.15), transparent 40%); pointer-events: none; z-index: 0; }
-
-  .screen {
-    display: none;
-    flex-direction: column;
-    min-height: 100vh;
-    position: relative;
-    z-index: 2;
-    padding-bottom: 100px;
-  }
-  .screen.active {
-    display: flex;
-    animation: screenIn 0.38s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  .screen.leaving {
-    display: flex;
-    animation: screenOut 0.38s cubic-bezier(0.16, 1, 0.3, 1);
-    pointer-events: none;
-    position: absolute;
-    inset: 0;
-    width: 100%;
-  }
-  @keyframes screenIn {
-    0% { opacity: 0; transform: translateX(40px) scale(0.97); }
-    100% { opacity: 1; transform: translateX(0) scale(1); }
-  }
-  @keyframes screenOut {
-    0% { opacity: 1; transform: translateX(0) scale(1); }
-    100% { opacity: 0; transform: translateX(-40px) scale(0.97); }
-  }
-
+  .screen { display: none; flex-direction: column; min-height: 100vh; position: relative; z-index: 2; padding-bottom: 100px; }
+  .screen.active { display: flex; animation: screenIn 0.38s cubic-bezier(0.16, 1, 0.3, 1); }
+  .screen.leaving { display: flex; animation: screenOut 0.38s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none; position: absolute; inset: 0; width: 100%; }
+  @keyframes screenIn { 0% { opacity: 0; transform: translateX(40px) scale(0.97); } 100% { opacity: 1; transform: translateX(0) scale(1); } }
+  @keyframes screenOut { 0% { opacity: 1; transform: translateX(0) scale(1); } 100% { opacity: 0; transform: translateX(-40px) scale(0.97); } }
   .header { text-align: center; padding: 20px; border-bottom: 1px solid var(--glass-border); }
-  .header h1 {
-    font-weight: 900; font-size: 28px; letter-spacing: -1px;
-    background: linear-gradient(270deg, #fff 0%, #ff2d2d 50%, #fff 100%);
-    background-size: 200% 200%;
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    animation: gradientShift 4s ease infinite;
-  }
-  @keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
+  .header h1 { font-weight: 900; font-size: 28px; letter-spacing: -1px; background: linear-gradient(270deg, #fff 0%, #ff2d2d 50%, #fff 100%); background-size: 200% 200%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradientShift 4s ease infinite; }
+  @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
   .header p { font-size: 10px; color: var(--text-dim); font-weight: 700; letter-spacing: 4px; text-transform: uppercase; margin-top: 4px; }
-
   .chat-area { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; min-height: 0; padding-bottom: 100px; }
-  .msg {
-    max-width: 85%; padding: 12px 16px; border-radius: 18px;
-    font-size: 15px; line-height: 1.4; word-wrap: break-word; white-space: pre-wrap;
-    animation: msgPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  @keyframes msgPop {
-    0% { opacity: 0; transform: translateY(15px) scale(0.95); }
-    60% { opacity: 1; transform: translateY(-2px) scale(1.01); }
-    100% { opacity: 1; transform: translateY(0) scale(1); }
-  }
+  .msg { max-width: 85%; padding: 12px 16px; border-radius: 18px; font-size: 15px; line-height: 1.4; word-wrap: break-word; white-space: pre-wrap; animation: msgPop 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+  @keyframes msgPop { 0% { opacity: 0; transform: translateY(15px) scale(0.95); } 60% { opacity: 1; transform: translateY(-2px) scale(1.01); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
   .msg.user { align-self: flex-end; background: linear-gradient(135deg, #ff2d2d, #b91c1c); color: #fff; border-bottom-right-radius: 6px; }
   .msg.bot { align-self: flex-start; background: var(--glass); border: 1px solid var(--glass-border); border-bottom-left-radius: 6px; color: #fff; }
   .msg.bot::before { content: "🧠 "; opacity: 0.7; }
   .msg.error { background: rgba(255,45,45,0.15); border: 1px solid rgba(255,45,45,0.5); color: #ff9999; align-self: center; font-size: 13px; }
   .typing-cursor::after { content: "▌"; color: var(--accent); animation: blink 0.8s infinite; }
   @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
-
   .input-bar { position: fixed; bottom: 75px; left: 0; right: 0; padding: 10px 14px; background: rgba(10,10,10,0.95); border-top: 1px solid var(--glass-border); display: flex; gap: 8px; z-index: 10; }
   .input-bar input { flex: 1; padding: 14px 18px; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 16px; color: #fff; font-size: 15px; outline: none; }
   .input-bar input::placeholder { color: rgba(255,255,255,0.3); }
   .input-bar input:focus { border-color: var(--accent); }
-  .send-btn {
-    width: 50px; height: 50px;
-    background: linear-gradient(135deg, #ff2d2d, #b91c1c);
-    border: none; border-radius: 14px; color: #fff; font-size: 20px;
-    cursor: pointer; flex-shrink: 0;
-    animation: pulseBtn 2.5s infinite;
-  }
-  @keyframes pulseBtn {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(255,45,45,0.5); }
-    50% { box-shadow: 0 0 0 10px rgba(255,45,45,0); }
-  }
+  .send-btn { width: 50px; height: 50px; background: linear-gradient(135deg, #ff2d2d, #b91c1c); border: none; border-radius: 14px; color: #fff; font-size: 20px; cursor: pointer; flex-shrink: 0; animation: pulseBtn 2.5s infinite; }
+  @keyframes pulseBtn { 0%, 100% { box-shadow: 0 0 0 0 rgba(255,45,45,0.5); } 50% { box-shadow: 0 0 0 10px rgba(255,45,45,0); } }
   .send-btn:active { transform: scale(0.92); }
-
   .nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,10,10,0.95); border-top: 1px solid var(--glass-border); display: flex; padding: 6px; z-index: 100; }
-  .nav-btn {
-    flex: 1; background: transparent; border: none; color: var(--text-dim);
-    padding: 8px 4px; border-radius: 12px; font-size: 10px; font-weight: 700;
-    cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  }
+  .nav-btn { flex: 1; background: transparent; border: none; color: var(--text-dim); padding: 8px 4px; border-radius: 12px; font-size: 10px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
   .nav-btn .nav-icon { font-size: 18px; transition: transform 0.25s; }
   .nav-btn.active { color: #fff; background: var(--accent-dim); }
   .nav-btn.active .nav-icon { transform: scale(1.15); }
   .nav-btn:active .nav-icon { transform: scale(0.85); }
-
   .container { padding: 20px; flex: 1; }
-  .card {
-    background: var(--glass); border: 1px solid var(--glass-border);
-    border-radius: 20px; padding: 24px; margin-bottom: 14px; text-align: center;
-    animation: cardIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) backwards;
-  }
-  @keyframes cardIn {
-    0% { opacity: 0; transform: translateY(20px); }
-    100% { opacity: 1; transform: translateY(0); }
-  }
+  .card { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; margin-bottom: 14px; text-align: center; animation: cardIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+  @keyframes cardIn { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
   .card:nth-child(1) { animation-delay: 0.05s; }
   .card:nth-child(2) { animation-delay: 0.12s; }
   .card:nth-child(3) { animation-delay: 0.19s; }
-
   .balance-num { font-size: 56px; font-weight: 900; background: linear-gradient(135deg, #fff, #ff2d2d); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; }
   .balance-label { font-size: 11px; color: var(--text-dim); letter-spacing: 4px; text-transform: uppercase; margin-bottom: 10px; font-weight: 700; }
-
-  .btn {
-    width: 100%; padding: 16px;
-    background: linear-gradient(135deg, #ff2d2d, #b91c1c);
-    border: none; border-radius: 16px; color: #fff; font-size: 16px; font-weight: 800;
-    cursor: pointer; margin-bottom: 10px; text-decoration: none; display: block; text-align: center;
-    transition: transform 0.15s, box-shadow 0.2s;
-  }
+  .btn { width: 100%; padding: 16px; background: linear-gradient(135deg, #ff2d2d, #b91c1c); border: none; border-radius: 16px; color: #fff; font-size: 16px; font-weight: 800; cursor: pointer; margin-bottom: 10px; text-decoration: none; display: block; text-align: center; transition: transform 0.15s, box-shadow 0.2s; }
   .btn:active { transform: scale(0.97); box-shadow: 0 0 25px rgba(255,45,45,0.6); }
   .btn.ghost { background: var(--glass); border: 1px solid var(--glass-border); }
-
   .promo-input { width: 100%; padding: 18px; font-size: 18px; font-weight: 800; border-radius: 16px; border: 2px solid var(--glass-border); background: var(--glass); color: #fff; text-align: center; outline: none; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 5px; transition: border-color 0.2s; }
   .promo-input:focus { border-color: var(--accent); }
-
   .help-link { display: inline-block; color: #fff; font-weight: 800; font-size: 18px; text-decoration: none; padding: 16px 32px; background: linear-gradient(135deg, #ff2d2d, #b91c1c); border-radius: 16px; margin-top: 10px; }
-
-  .toast {
-    position: fixed; top: 20px; left: 50%;
-    transform: translateX(-50%) translateY(-160px);
-    background: rgba(10,10,10,0.95); border: 2px solid rgba(255,45,45,0.4);
-    padding: 16px 24px; border-radius: 18px; font-weight: 700; font-size: 14px;
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
-    opacity: 0; z-index: 1000; max-width: 90%; text-align: center; white-space: pre-line;
-  }
+  .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-160px); background: rgba(10,10,10,0.95); border: 2px solid rgba(255,45,45,0.4); padding: 16px 24px; border-radius: 18px; font-weight: 700; font-size: 14px; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease; opacity: 0; z-index: 1000; max-width: 90%; text-align: center; white-space: pre-line; }
   .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
   .toast.success { border-color: rgba(16,185,129,0.8); }
   .toast.error { border-color: rgba(255,45,45,0.8); }
-
   .empty-state { text-align: center; color: var(--text-dim); font-size: 13px; padding: 40px 20px; }
 </style>
 </head>
@@ -246,22 +159,17 @@
   function showScreen(id) {
     const current = document.querySelector('.screen.active');
     const next = document.getElementById(id);
-
     if (current === next) return;
-
     if (current) {
       current.classList.remove('active');
       current.classList.add('leaving');
       setTimeout(() => current.classList.remove('leaving'), 380);
     }
-
     next.classList.remove('leaving');
     next.classList.add('active');
-
     document.querySelectorAll('.nav-btn').forEach(b => {
       b.classList.toggle('active', b.dataset.screen === id);
     });
-
     if (id === 'screen-balance') loadBalance();
   }
 
@@ -335,6 +243,7 @@
 
     const botDiv = addMessage('', 'bot');
     botDiv.classList.add('typing-cursor');
+    botDiv.textContent = '🧠 Думаю...';
 
     try {
       const r = await fetch(API_BASE + '/api/chat', {
@@ -343,40 +252,23 @@
         body: JSON.stringify({ user_id: userId, text: text })
       });
 
-      if (!r.ok) {
-        botDiv.classList.remove('typing-cursor');
-        botDiv.textContent = '❌ ' + r.status;
+      const data = await r.json();
+
+      botDiv.classList.remove('typing-cursor');
+
+      if (!data.ok) {
+        botDiv.textContent = '❌ ' + (data.error || 'Ошибка');
+        botDiv.classList.add('error');
         isSending = false; btn.disabled = false;
         return;
       }
 
-      const reader = r.body.getReader();
-      const decoder = new TextDecoder();
-      let buf = "";
-      let full = "";
+      botDiv.textContent = data.reply;
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buf += decoder.decode(value, { stream: true });
-        const lines = buf.split('\n');
-        buf = lines.pop() || "";
-        for (const line of lines) {
-          const t = line.trim();
-          if (!t.startsWith('data:')) continue;
-          try {
-            const p = JSON.parse(t.slice(5).trim());
-            if (p.error) { botDiv.classList.remove('typing-cursor'); botDiv.textContent = '❌ ' + p.error; botDiv.classList.add('error'); isSending = false; btn.disabled = false; return; }
-            if (p.delta) { full += p.delta; botDiv.textContent = full; document.getElementById('chat-area').scrollTop = 999999; }
-            if (p.done) { botDiv.classList.remove('typing-cursor'); if (p.full) botDiv.textContent = p.full; }
-          } catch (e) {}
-        }
-      }
-      botDiv.classList.remove('typing-cursor');
-      if (!full) botDiv.textContent = '...';
     } catch (e) {
       botDiv.classList.remove('typing-cursor');
       botDiv.textContent = '❌ ' + e.message;
+      botDiv.classList.add('error');
     }
 
     isSending = false; btn.disabled = false;
