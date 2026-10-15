@@ -7,7 +7,7 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  :root { --bg: #0a0a0a; --accent: #ff2d2d; --accent-dim: rgba(255,45,45,0.15); --glass: rgba(255,255,255,0.04); --glass-border: rgba(255,255,255,0.1); --text: #fff; --text-dim: rgba(255,255,255,0.5); }
+  :root { --bg: #0a0a0a; --accent: #ff2d2d; --accent-dim: rgba(255,45,45,0.15); --glass: rgba(255,255,255,0.04); --glass-border: rgba(255,255,255,0.1); --text: #fff; --text-dim: rgba(255,255,255,0.5); --gold: #fbbf24; --purple: #8b5cf6; --cyan: #22d3ee; }
   html, body { width: 100%; overflow-x: hidden; background: var(--bg); }
   body { font-family: -apple-system, sans-serif; color: var(--text); min-height: 100vh; display: flex; flex-direction: column; position: relative; }
   body::before { content: ""; position: fixed; inset: 0; background: radial-gradient(circle at 20% 10%, rgba(255,45,45,0.25), transparent 35%), radial-gradient(circle at 80% 90%, rgba(255,45,45,0.15), transparent 40%); pointer-events: none; z-index: 0; }
@@ -61,6 +61,26 @@
   .toast.success { border-color: rgba(16,185,129,0.8); }
   .toast.error { border-color: rgba(255,45,45,0.8); }
   .empty-state { text-align: center; color: var(--text-dim); font-size: 13px; padding: 40px 20px; }
+
+  /* Магазин */
+  .shop-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+  .shop-tab { flex: 1; padding: 12px; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 14px; color: var(--text-dim); font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+  .shop-tab.active { background: var(--accent-dim); border-color: var(--accent); color: #fff; }
+
+  .shop-item { display: flex; align-items: center; gap: 12px; padding: 14px; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 16px; margin-bottom: 10px; transition: transform 0.2s, border-color 0.2s; animation: itemIn 0.4s ease backwards; }
+  @keyframes itemIn { 0% { opacity: 0; transform: translateX(-20px); } 100% { opacity: 1; transform: translateX(0); } }
+  .shop-item:active { transform: scale(0.98); }
+  .shop-item.vip { background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(251,191,36,0.08), rgba(34,211,238,0.1)); border: 1px solid rgba(251,191,36,0.4); position: relative; overflow: hidden; }
+  .shop-item.vip::before { content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: conic-gradient(from 0deg, transparent, rgba(251,191,36,0.3), transparent 30%); animation: spin 4s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .shop-item.vip::after { content: "✨ VIP ✨"; position: absolute; top: 6px; right: 10px; font-size: 9px; font-weight: 900; color: var(--gold); letter-spacing: 2px; animation: vipPulse 2s ease-in-out infinite; z-index: 1; }
+  @keyframes vipPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+  .shop-flag { width: 48px; height: 48px; border-radius: 12px; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; position: relative; z-index: 1; }
+  .shop-info { flex: 1; position: relative; z-index: 1; }
+  .shop-name { font-weight: 800; font-size: 15px; margin-bottom: 2px; }
+  .shop-code { font-size: 11px; color: var(--text-dim); font-weight: 600; }
+  .shop-price { font-size: 15px; font-weight: 900; color: var(--gold); white-space: nowrap; position: relative; z-index: 1; }
+  .shop-price.vip-price { font-size: 18px; background: linear-gradient(135deg, #fbbf24, #d946ef, #22d3ee); background-size: 200% 200%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradientShift 3s ease infinite; }
 </style>
 </head>
 <body>
@@ -79,16 +99,73 @@
 <div id="screen-main" class="screen">
   <div class="header"><h1>Магазин</h1><p>ByratShop</p></div>
   <div class="container">
-    <div class="card">
-      <div style="font-size: 64px; margin-bottom: 16px;">🛒</div>
-      <div style="font-size: 18px; font-weight: 800; margin-bottom: 8px;">ByratShop</div>
-      <div style="font-size: 13px; color: var(--text-dim); line-height: 1.6; margin-bottom: 16px;">📱 Аккаунты Telegram<br>🎮 Сетки Dota 2</div>
-      <a href="https://t.me/ByratShop_bot" target="_blank" class="btn">Открыть магазин</a>
+    <div class="shop-tabs">
+      <button class="shop-tab active" onclick="showTab('tg', this)">📱 Аккаунты</button>
+      <button class="shop-tab" onclick="showTab('dota', this)">🎮 Сетки Dota</button>
     </div>
-    <div class="card">
-      <div style="font-size: 14px; font-weight: 800; margin-bottom: 10px;">📢 Каналы</div>
-      <a href="https://t.me/ByratShop" target="_blank" class="btn ghost" style="margin-bottom: 8px;">📢 Канал</a>
-      <a href="https://t.me/OtziviByratShop" target="_blank" class="btn ghost">⭐ Отзывы</a>
+    <div id="tab-tg">
+      <div class="shop-item" onclick="buyItem('usa', 100)">
+        <div class="shop-flag">🇺🇸</div>
+        <div class="shop-info"><div class="shop-name">США</div><div class="shop-code">+1</div></div>
+        <div class="shop-price">100 ⭐</div>
+      </div>
+      <div class="shop-item" onclick="buyItem('canada', 100)">
+        <div class="shop-flag">🇨🇦</div>
+        <div class="shop-info"><div class="shop-name">Канада</div><div class="shop-code">+1</div></div>
+        <div class="shop-price">100 ⭐</div>
+      </div>
+      <div class="shop-item" onclick="buyItem('belarus', 170)">
+        <div class="shop-flag">🇧🇾</div>
+        <div class="shop-info"><div class="shop-name">Беларусь</div><div class="shop-code">+375</div></div>
+        <div class="shop-price">170 ⭐</div>
+      </div>
+      <div class="shop-item" onclick="buyItem('russia', 170)">
+        <div class="shop-flag">🇷🇺</div>
+        <div class="shop-info"><div class="shop-name">Россия</div><div class="shop-code">+7</div></div>
+        <div class="shop-price">170 ⭐</div>
+      </div>
+      <div class="shop-item" onclick="buyItem('ukraine', 170)">
+        <div class="shop-flag">🇺🇦</div>
+        <div class="shop-info"><div class="shop-name">Украина</div><div class="shop-code">+380</div></div>
+        <div class="shop-price">170 ⭐</div>
+      </div>
+      <div class="shop-item" onclick="buyItem('france', 150)">
+        <div class="shop-flag">🇫🇷</div>
+        <div class="shop-info"><div class="shop-name">Франция</div><div class="shop-code">+33</div></div>
+        <div class="shop-price">150 ⭐</div>
+      </div>
+      <div class="shop-item" onclick="buyItem('poland', 150)">
+        <div class="shop-flag">🇵🇱</div>
+        <div class="shop-info"><div class="shop-name">Польша</div><div class="shop-code">+48</div></div>
+        <div class="shop-price">150 ⭐</div>
+      </div>
+      <div class="shop-item" onclick="buyItem('pakistan', 130)">
+        <div class="shop-flag">🇵🇰</div>
+        <div class="shop-info"><div class="shop-name">Пакистан</div><div class="shop-code">+92</div></div>
+        <div class="shop-price">130 ⭐</div>
+      </div>
+      <div class="shop-item" onclick="buyItem('italy', 150)">
+        <div class="shop-flag">🇮🇹</div>
+        <div class="shop-info"><div class="shop-name">Италия</div><div class="shop-code">+39</div></div>
+        <div class="shop-price">150 ⭐</div>
+      </div>
+      <div class="shop-item" onclick="buyItem('myanmar', 120)">
+        <div class="shop-flag">🇲🇲</div>
+        <div class="shop-info"><div class="shop-name">Мьянма</div><div class="shop-code">+95</div></div>
+        <div class="shop-price">120 ⭐</div>
+      </div>
+      <div class="shop-item vip" onclick="buyItem('vip', 500)">
+        <div class="shop-flag">💎</div>
+        <div class="shop-info"><div class="shop-name">Анонимный</div><div class="shop-code">+888 ✨ VIP</div></div>
+        <div class="shop-price vip-price">500 ⭐</div>
+      </div>
+    </div>
+    <div id="tab-dota" style="display:none;">
+      <div class="shop-item" onclick="buyDota()">
+        <div class="shop-flag">🎨</div>
+        <div class="shop-info"><div class="shop-name">CFG-сетка из фото</div><div class="shop-code">Кастомная сетка</div></div>
+        <div class="shop-price">150 ⭐</div>
+      </div>
     </div>
   </div>
 </div>
@@ -180,6 +257,13 @@
     setTimeout(() => t.className = 'toast ' + (type || ''), 3000);
   }
 
+  function showTab(tab, btn) {
+    document.querySelectorAll('.shop-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-tg').style.display = tab === 'tg' ? 'block' : 'none';
+    document.getElementById('tab-dota').style.display = tab === 'dota' ? 'block' : 'none';
+  }
+
   async function loadBalance() {
     const n = document.getElementById('balance-num');
     const f = document.getElementById('free-num');
@@ -202,6 +286,28 @@
       showToast(d.message, d.ok ? 'success' : 'error');
       if (d.ok) { i.value = ''; loadBalance(); }
     } catch (e) { showToast('Ошибка', 'error'); }
+  }
+
+  async function buyItem(code, price) {
+    if (!userId) { showToast('Открой через Telegram', 'error'); return; }
+    const countryNames = {
+      usa: 'США', canada: 'Канада', belarus: 'Беларусь', russia: 'Россия',
+      ukraine: 'Украина', france: 'Франция', poland: 'Польша', pakistan: 'Пакистан',
+      italy: 'Италия', myanmar: 'Мьянма', vip: 'VIP Анонимный'
+    };
+    showToast(`Товар: ${countryNames[code] || code} — ${price} ⭐`, 'success');
+    if (Telegram.WebApp) {
+      Telegram.WebApp.sendData(JSON.stringify({ action: 'buy', item: code, price: price }));
+      setTimeout(() => Telegram.WebApp.close(), 500);
+    }
+  }
+
+  async function buyDota() {
+    showToast('Заказ: CFG-сетка Dota', 'success');
+    if (Telegram.WebApp) {
+      Telegram.WebApp.sendData(JSON.stringify({ action: 'buy', item: 'dota_cfg', price: 150 }));
+      setTimeout(() => Telegram.WebApp.close(), 500);
+    }
   }
 
   async function loadHistory() {
