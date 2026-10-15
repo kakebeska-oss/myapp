@@ -3,389 +3,403 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ByratGPT</title>
+<title>Byrat Shop</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  :root { --bg: #0a0a0a; --accent: #ff2d2d; --accent-dim: rgba(255,45,45,0.15); --glass: rgba(255,255,255,0.04); --glass-border: rgba(255,255,255,0.1); --text: #fff; --text-dim: rgba(255,255,255,0.5); --gold: #fbbf24; --purple: #8b5cf6; --cyan: #22d3ee; }
-  html, body { width: 100%; overflow-x: hidden; background: var(--bg); }
-  body { font-family: -apple-system, sans-serif; color: var(--text); min-height: 100vh; display: flex; flex-direction: column; position: relative; }
-  body::before { content: ""; position: fixed; inset: 0; background: radial-gradient(circle at 20% 10%, rgba(255,45,45,0.25), transparent 35%), radial-gradient(circle at 80% 90%, rgba(255,45,45,0.15), transparent 40%); pointer-events: none; z-index: 0; }
-  .screen { display: none; flex-direction: column; min-height: 100vh; position: relative; z-index: 2; padding-bottom: 100px; }
-  .screen.active { display: flex; animation: screenIn 0.38s cubic-bezier(0.16, 1, 0.3, 1); }
-  .screen.leaving { display: flex; animation: screenOut 0.38s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none; position: absolute; inset: 0; width: 100%; }
-  @keyframes screenIn { 0% { opacity: 0; transform: translateX(40px) scale(0.97); } 100% { opacity: 1; transform: translateX(0) scale(1); } }
-  @keyframes screenOut { 0% { opacity: 1; transform: translateX(0) scale(1); } 100% { opacity: 0; transform: translateX(-40px) scale(0.97); } }
-  .header { text-align: center; padding: 20px; border-bottom: 1px solid var(--glass-border); }
-  .header h1 { font-weight: 900; font-size: 28px; letter-spacing: -1px; background: linear-gradient(270deg, #fff 0%, #ff2d2d 50%, #fff 100%); background-size: 200% 200%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradientShift 4s ease infinite; }
-  @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-  .header p { font-size: 10px; color: var(--text-dim); font-weight: 700; letter-spacing: 4px; text-transform: uppercase; margin-top: 4px; }
-  .chat-area { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; min-height: 0; padding-bottom: 100px; }
-  .msg { max-width: 85%; padding: 12px 16px; border-radius: 18px; font-size: 15px; line-height: 1.4; word-wrap: break-word; white-space: pre-wrap; animation: msgPop 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-  @keyframes msgPop { 0% { opacity: 0; transform: translateY(15px) scale(0.95); } 60% { opacity: 1; transform: translateY(-2px) scale(1.01); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
-  .msg.user { align-self: flex-end; background: linear-gradient(135deg, #ff2d2d, #b91c1c); color: #fff; border-bottom-right-radius: 6px; }
-  .msg.bot { align-self: flex-start; background: var(--glass); border: 1px solid var(--glass-border); border-bottom-left-radius: 6px; color: #fff; }
-  .msg.bot::before { content: "🧠 "; opacity: 0.7; }
-  .msg.error { background: rgba(255,45,45,0.15); border: 1px solid rgba(255,45,45,0.5); color: #ff9999; align-self: center; font-size: 13px; }
-  .typing-cursor::after { content: "▌"; color: var(--accent); animation: blink 0.8s infinite; }
-  @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
-  .input-bar { position: fixed; bottom: 75px; left: 0; right: 0; padding: 10px 14px; background: rgba(10,10,10,0.95); border-top: 1px solid var(--glass-border); display: flex; gap: 8px; z-index: 10; }
-  .input-bar input { flex: 1; padding: 14px 18px; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 16px; color: #fff; font-size: 15px; outline: none; }
-  .input-bar input::placeholder { color: rgba(255,255,255,0.3); }
-  .input-bar input:focus { border-color: var(--accent); }
-  .send-btn { width: 50px; height: 50px; background: linear-gradient(135deg, #ff2d2d, #b91c1c); border: none; border-radius: 14px; color: #fff; font-size: 20px; cursor: pointer; flex-shrink: 0; animation: pulseBtn 2.5s infinite; }
-  @keyframes pulseBtn { 0%, 100% { box-shadow: 0 0 0 0 rgba(255,45,45,0.5); } 50% { box-shadow: 0 0 0 10px rgba(255,45,45,0); } }
-  .send-btn:active { transform: scale(0.92); }
-  .nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,10,10,0.95); border-top: 1px solid var(--glass-border); display: flex; padding: 6px; z-index: 100; }
-  .nav-btn { flex: 1; background: transparent; border: none; color: var(--text-dim); padding: 8px 4px; border-radius: 12px; font-size: 10px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
-  .nav-btn .nav-icon { font-size: 18px; transition: transform 0.25s; }
-  .nav-btn.active { color: #fff; background: var(--accent-dim); }
-  .nav-btn.active .nav-icon { transform: scale(1.15); }
-  .nav-btn:active .nav-icon { transform: scale(0.85); }
-  .container { padding: 20px; flex: 1; }
-  .card { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; margin-bottom: 14px; text-align: center; animation: cardIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
-  @keyframes cardIn { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
-  .card:nth-child(1) { animation-delay: 0.05s; }
-  .card:nth-child(2) { animation-delay: 0.12s; }
-  .card:nth-child(3) { animation-delay: 0.19s; }
-  .balance-num { font-size: 56px; font-weight: 900; background: linear-gradient(135deg, #fff, #ff2d2d); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; }
-  .balance-label { font-size: 11px; color: var(--text-dim); letter-spacing: 4px; text-transform: uppercase; margin-bottom: 10px; font-weight: 700; }
-  .btn { width: 100%; padding: 16px; background: linear-gradient(135deg, #ff2d2d, #b91c1c); border: none; border-radius: 16px; color: #fff; font-size: 16px; font-weight: 800; cursor: pointer; margin-bottom: 10px; text-decoration: none; display: block; text-align: center; transition: transform 0.15s, box-shadow 0.2s; }
-  .btn:active { transform: scale(0.97); box-shadow: 0 0 25px rgba(255,45,45,0.6); }
-  .btn.ghost { background: var(--glass); border: 1px solid var(--glass-border); }
-  .promo-input { width: 100%; padding: 18px; font-size: 18px; font-weight: 800; border-radius: 16px; border: 2px solid var(--glass-border); background: var(--glass); color: #fff; text-align: center; outline: none; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 5px; transition: border-color 0.2s; }
-  .promo-input:focus { border-color: var(--accent); }
-  .help-link { display: inline-block; color: #fff; font-weight: 800; font-size: 18px; text-decoration: none; padding: 16px 32px; background: linear-gradient(135deg, #ff2d2d, #b91c1c); border-radius: 16px; margin-top: 10px; }
-  .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-160px); background: rgba(10,10,10,0.95); border: 2px solid rgba(255,45,45,0.4); padding: 16px 24px; border-radius: 18px; font-weight: 700; font-size: 14px; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease; opacity: 0; z-index: 1000; max-width: 90%; text-align: center; white-space: pre-line; }
+  :root {
+    --bg: #05050f;
+    --accent: #8b5cf6;
+    --accent-hot: #d946ef;
+    --accent-cyan: #22d3ee;
+    --gold: #fbbf24;
+    --green: #10b981;
+    --red: #ef4444;
+    --glass: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --text: #ffffff;
+    --text-dim: rgba(255, 255, 255, 0.55);
+  }
+  html, body { width: 100%; overflow-x: hidden; }
+  body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; position: relative; }
+  body::before { content: ""; position: fixed; inset: 0; background: radial-gradient(circle at 20% 20%, rgba(139,92,246,0.45), transparent 40%), radial-gradient(circle at 80% 30%, rgba(217,70,239,0.35), transparent 40%), radial-gradient(circle at 50% 80%, rgba(34,211,238,0.3), transparent 45%), radial-gradient(circle at 10% 90%, rgba(251,191,36,0.2), transparent 40%); animation: bgPulse 8s ease-in-out infinite alternate; pointer-events: none; z-index: 0; }
+  @keyframes bgPulse { from { transform: scale(1); } to { transform: scale(1.1); } }
+  .particle { position: fixed; font-weight: 900; pointer-events: none; z-index: 1; animation: floatUp linear infinite; will-change: transform; }
+  @keyframes floatUp { 0% { transform: translateY(0) translateX(0) rotate(0deg) scale(0.8); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 0.85; } 100% { transform: translateY(-110vh) translateX(30px) rotate(360deg) scale(1.1); opacity: 0; } }
+  .screen { display: none; padding: 24px 20px 130px; min-height: 100vh; position: relative; z-index: 2; flex-direction: column; }
+  .screen.active { display: flex; animation: screenIn 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+  @keyframes screenIn { from { opacity: 0; transform: translateY(25px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  .header { text-align: center; margin-bottom: 28px; margin-top: 12px; }
+  .header h1 { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 36px; background: linear-gradient(135deg, #fff 0%, #d946ef 40%, #8b5cf6 70%, #22d3ee 100%); background-size: 200% 200%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradientShift 6s ease infinite; filter: drop-shadow(0 0 25px rgba(217,70,239,0.5)); margin-bottom: 8px; }
+  @keyframes gradientShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+  .header p { font-size: 12px; color: var(--text-dim); font-weight: 700; letter-spacing: 3px; text-transform: uppercase; }
+  .btn { background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); color: var(--text); padding: 16px 20px; font-size: 16px; font-weight: 700; font-family: 'Inter', sans-serif; border-radius: 20px; cursor: pointer; transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s; text-align: left; display: flex; align-items: center; gap: 14px; width: 100%; margin: 7px 0; position: relative; overflow: hidden; }
+  .btn:active { transform: scale(0.97); }
+  .btn-hero { background: linear-gradient(135deg, #8b5cf6 0%, #d946ef 50%, #8b5cf6 100%); background-size: 200% 200%; border: none; box-shadow: 0 25px 60px rgba(139,92,246,0.6); justify-content: center; text-align: center; padding: 28px; margin: 50px 0; animation: gradientShift 5s ease infinite, heroGlow 3s ease-in-out infinite; }
+  @keyframes heroGlow { 0%, 100% { box-shadow: 0 25px 60px rgba(139,92,246,0.6); } 50% { box-shadow: 0 25px 80px rgba(217,70,239,0.8); } }
+  .btn-hero .btn-text { align-items: center; }
+  .btn-hero .btn-title { font-size: 22px; letter-spacing: 2px; }
+  .btn-text { display: flex; flex-direction: column; gap: 2px; }
+  .btn-title { font-weight: 800; font-size: 16px; }
+  .btn-sub { font-size: 11px; color: var(--text-dim); font-weight: 600; }
+
+  .categories { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 40px; flex: 1; align-content: center; }
+  .category { background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 24px; padding: 28px 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; cursor: pointer; transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s; text-align: center; min-height: 220px; position: relative; overflow: hidden; }
+  .category:hover { transform: translateY(-6px) scale(1.02); }
+  .category.tg:hover { border-color: rgba(34,211,238,0.6); box-shadow: 0 25px 60px rgba(34,211,238,0.4); }
+  .category.dota:hover { border-color: rgba(239,68,68,0.6); box-shadow: 0 25px 60px rgba(239,68,68,0.4); }
+  .category:active { transform: scale(0.96); }
+  .category-icon { font-size: 56px; filter: drop-shadow(0 0 20px currentColor); animation: iconFloat 3s ease-in-out infinite; }
+  @keyframes iconFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  .category.tg .category-icon { color: var(--accent-cyan); }
+  .category.dota .category-icon { color: #ef4444; }
+  .category-title { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 17px; line-height: 1.2; }
+  .category-sub { font-size: 11px; color: var(--text-dim); font-weight: 600; }
+
+  .shared-balance-note { margin-top: 30px; text-align: center; font-size: 12px; color: var(--text-dim); font-weight: 700; padding: 14px 18px; background: rgba(139,92,246,0.08); border: 1px solid rgba(139,92,246,0.25); border-radius: 14px; animation: noteGlow 3s ease-in-out infinite alternate; }
+  @keyframes noteGlow { from { box-shadow: 0 0 0 rgba(139,92,246,0); } to { box-shadow: 0 0 25px rgba(139,92,246,0.3); } }
+
+  .balance-card { background: linear-gradient(135deg, rgba(251,191,36,0.18), rgba(251,191,36,0.03)); border: 1px solid rgba(251,191,36,0.4); border-radius: 28px; padding: 40px 24px; text-align: center; margin: 24px 0; position: relative; overflow: hidden; animation: balanceGlow 3s ease-in-out infinite alternate; }
+  @keyframes balanceGlow { from { box-shadow: 0 20px 60px rgba(251,191,36,0.2); } to { box-shadow: 0 20px 80px rgba(251,191,36,0.5); } }
+  .balance-label { font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 4px; margin-bottom: 16px; font-weight: 700; }
+  .balance-num { font-family: 'Montserrat', sans-serif; font-size: 68px; font-weight: 900; background: linear-gradient(135deg, #fff 0%, #fbbf24 50%, #fff 100%); background-size: 200% 200%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradientShift 4s ease infinite; line-height: 1; }
+  .balance-star { font-size: 24px; margin-left: 6px; }
+
+  /* АККАУНТЫ */
+  .shop-item { display: flex; align-items: center; gap: 14px; padding: 16px; background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 20px; margin: 10px 0; cursor: pointer; transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s; animation: itemIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards; position: relative; }
+  @keyframes itemIn { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
+  .shop-item:nth-child(1) { animation-delay: 0.05s; }
+  .shop-item:nth-child(2) { animation-delay: 0.10s; }
+  .shop-item:nth-child(3) { animation-delay: 0.15s; }
+  .shop-item:nth-child(4) { animation-delay: 0.20s; }
+  .shop-item:nth-child(5) { animation-delay: 0.25s; }
+  .shop-item:nth-child(6) { animation-delay: 0.30s; }
+  .shop-item:nth-child(7) { animation-delay: 0.35s; }
+  .shop-item:nth-child(8) { animation-delay: 0.40s; }
+  .shop-item:nth-child(9) { animation-delay: 0.45s; }
+  .shop-item:nth-child(10) { animation-delay: 0.50s; }
+  .shop-item:nth-child(11) { animation-delay: 0.55s; }
+  .shop-item:active { transform: scale(0.97); }
+  .shop-item:hover { border-color: rgba(139,92,246,0.5); transform: translateY(-3px); box-shadow: 0 20px 50px rgba(139,92,246,0.3); }
+  .shop-flag { width: 60px; height: 60px; border-radius: 16px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); font-size: 34px; }
+  .shop-info { flex: 1; }
+  .shop-name { font-weight: 800; font-size: 17px; margin-bottom: 4px; }
+  .shop-code { font-size: 12px; color: var(--text-dim); font-weight: 600; }
+  .shop-price { font-size: 16px; color: var(--gold); font-weight: 900; white-space: nowrap; }
+
+  /* VIP */
+  .shop-item.vip { background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(217,70,239,0.15), rgba(251,191,36,0.15), rgba(34,211,238,0.15)); background-size: 300% 300%; border: 2px solid transparent; background-clip: padding-box; position: relative; overflow: hidden; animation: vipGlow 3s ease-in-out infinite, vipGradient 5s ease infinite; padding: 20px 16px; }
+  @keyframes vipGradient { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+  @keyframes vipGlow { 0%, 100% { box-shadow: 0 20px 60px rgba(251,191,36,0.4), 0 0 40px rgba(139,92,246,0.4); } 50% { box-shadow: 0 25px 80px rgba(251,191,36,0.8), 0 0 60px rgba(217,70,239,0.6); } }
+  .shop-item.vip::before { content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: conic-gradient(from 0deg, transparent, rgba(251,191,36,0.4), transparent 30%, rgba(217,70,239,0.4), transparent 60%); animation: spin 4s linear infinite; pointer-events: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .shop-item.vip::after { content: "✨ VIP ✨"; position: absolute; top: 8px; right: 12px; font-size: 10px; font-weight: 900; color: var(--gold); letter-spacing: 2px; animation: vipPulse 1.5s ease-in-out infinite; z-index: 3; text-shadow: 0 0 10px rgba(251,191,36,0.8); }
+  @keyframes vipPulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.1); } }
+  .shop-item.vip .shop-flag { background: linear-gradient(135deg, rgba(251,191,36,0.3), rgba(217,70,239,0.3)); border: 1px solid rgba(251,191,36,0.5); box-shadow: 0 0 20px rgba(251,191,36,0.5); font-size: 36px; }
+  .shop-item.vip .shop-name { background: linear-gradient(135deg, #fbbf24, #d946ef, #22d3ee); background-size: 200% 200%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradientShift 3s ease infinite; font-size: 18px; }
+  .shop-item.vip .shop-code { color: var(--gold); font-weight: 700; }
+  .shop-item.vip .shop-price { background: linear-gradient(135deg, #fbbf24, #d946ef, #22d3ee); background-size: 200% 200%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradientShift 3s ease infinite; font-size: 20px; font-weight: 900; }
+  .shop-item.vip > * { position: relative; z-index: 2; }
+
+  /* Сетка Dota */
+  .dota-card { display: flex; flex-direction: column; padding: 22px; background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 22px; margin: 12px 0; text-align: center; }
+  .dota-icon { font-size: 48px; margin-bottom: 12px; animation: iconFloat 3s ease-in-out infinite; }
+  .dota-title { font-weight: 800; font-size: 18px; margin-bottom: 6px; }
+  .dota-desc { font-size: 13px; color: var(--text-dim); margin-bottom: 14px; line-height: 1.5; }
+  .dota-price { font-size: 22px; color: var(--gold); font-weight: 900; margin-bottom: 16px; }
+  .dota-buy { width: 100%; padding: 16px; background: linear-gradient(135deg, #10b981, #059669); border: none; border-radius: 14px; color: #fff; font-size: 15px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 25px rgba(16,185,129,0.5); transition: transform 0.2s; }
+  .dota-buy:active { transform: scale(0.96); }
+
+  .topup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 24px 0; }
+  .topup-btn { background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); color: var(--text); padding: 26px 12px; border-radius: 22px; font-family: 'Inter', sans-serif; cursor: pointer; transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .topup-btn:hover { border-color: rgba(139,92,246,0.6); transform: translateY(-5px) scale(1.03); box-shadow: 0 25px 60px rgba(139,92,246,0.4); }
+  .topup-btn:active { transform: scale(0.95); }
+  .topup-amount { font-size: 28px; font-weight: 900; font-family: 'Montserrat', sans-serif; background: linear-gradient(135deg, #fff, #d946ef); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .topup-star { font-size: 16px; }
+
+  .promo-input { width: 100%; padding: 22px; font-size: 20px; font-weight: 800; font-family: 'Montserrat', sans-serif; border-radius: 20px; border: 2px solid var(--glass-border); background: var(--glass); color: white; text-align: center; outline: none; margin: 24px 0; text-transform: uppercase; letter-spacing: 6px; transition: border-color 0.3s, box-shadow 0.3s; }
+  .promo-input:focus { border-color: var(--accent-hot); box-shadow: 0 0 0 6px rgba(217,70,239,0.2), 0 0 40px rgba(217,70,239,0.4); }
+
+  .help-card { background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 24px; padding: 32px 24px; text-align: center; margin: 20px 0; }
+  .help-link { display: inline-block; color: #fff; font-weight: 800; font-size: 18px; text-decoration: none; padding: 16px 32px; background: linear-gradient(135deg, #22d3ee, #0891b2); border-radius: 16px; margin-top: 16px; box-shadow: 0 10px 30px rgba(34,211,238,0.5); }
+
+  .back-btn { background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); color: var(--text-dim); padding: 14px 24px; border-radius: 16px; font-size: 14px; font-weight: 700; font-family: 'Inter', sans-serif; cursor: pointer; margin: 20px auto 0; display: block; width: fit-content; }
+  .back-btn:active { transform: scale(0.95); color: var(--text); }
+
+  .nav { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); background: rgba(10,10,25,0.85); backdrop-filter: blur(30px); border: 1px solid var(--glass-border); border-radius: 26px; padding: 10px; display: flex; gap: 4px; z-index: 100; box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 40px rgba(139,92,246,0.2); max-width: calc(100% - 32px); animation: navIn 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+  @keyframes navIn { from { opacity: 0; transform: translateX(-50%) translateY(100px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+  .nav-btn { background: transparent; border: none; color: var(--text-dim); padding: 10px 14px; border-radius: 16px; font-size: 10px; font-weight: 700; font-family: 'Inter', sans-serif; cursor: pointer; transition: all 0.3s; display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 62px; }
+  .nav-btn .nav-icon { font-size: 22px; transition: transform 0.3s; }
+  .nav-btn.active { color: #fff; background: linear-gradient(135deg, rgba(139,92,246,0.4), rgba(217,70,239,0.3)); box-shadow: 0 8px 25px rgba(139,92,246,0.5); }
+  .nav-btn.active .nav-icon { transform: scale(1.2); }
+
+  .toast { position: fixed; top: 24px; left: 50%; transform: translateX(-50%) translateY(-160px); background: rgba(10,10,25,0.95); backdrop-filter: blur(24px); border: 2px solid var(--glass-border); padding: 18px 28px; border-radius: 20px; font-weight: 800; font-size: 15px; transition: transform 0.4s ease, opacity 0.4s ease; opacity: 0; z-index: 1000; pointer-events: none; max-width: 90%; text-align: center; box-shadow: 0 25px 80px rgba(0,0,0,0.7); }
   .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
   .toast.success { border-color: rgba(16,185,129,0.8); }
-  .toast.error { border-color: rgba(255,45,45,0.8); }
-  .empty-state { text-align: center; color: var(--text-dim); font-size: 13px; padding: 40px 20px; }
-
-  /* Магазин */
-  .shop-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
-  .shop-tab { flex: 1; padding: 12px; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 14px; color: var(--text-dim); font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
-  .shop-tab.active { background: var(--accent-dim); border-color: var(--accent); color: #fff; }
-
-  .shop-item { display: flex; align-items: center; gap: 12px; padding: 14px; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 16px; margin-bottom: 10px; transition: transform 0.2s, border-color 0.2s; animation: itemIn 0.4s ease backwards; }
-  @keyframes itemIn { 0% { opacity: 0; transform: translateX(-20px); } 100% { opacity: 1; transform: translateX(0); } }
-  .shop-item:active { transform: scale(0.98); }
-  .shop-item.vip { background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(251,191,36,0.08), rgba(34,211,238,0.1)); border: 1px solid rgba(251,191,36,0.4); position: relative; overflow: hidden; }
-  .shop-item.vip::before { content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: conic-gradient(from 0deg, transparent, rgba(251,191,36,0.3), transparent 30%); animation: spin 4s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .shop-item.vip::after { content: "✨ VIP ✨"; position: absolute; top: 6px; right: 10px; font-size: 9px; font-weight: 900; color: var(--gold); letter-spacing: 2px; animation: vipPulse 2s ease-in-out infinite; z-index: 1; }
-  @keyframes vipPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-  .shop-flag { width: 48px; height: 48px; border-radius: 12px; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; position: relative; z-index: 1; }
-  .shop-info { flex: 1; position: relative; z-index: 1; }
-  .shop-name { font-weight: 800; font-size: 15px; margin-bottom: 2px; }
-  .shop-code { font-size: 11px; color: var(--text-dim); font-weight: 600; }
-  .shop-price { font-size: 15px; font-weight: 900; color: var(--gold); white-space: nowrap; position: relative; z-index: 1; }
-  .shop-price.vip-price { font-size: 18px; background: linear-gradient(135deg, #fbbf24, #d946ef, #22d3ee); background-size: 200% 200%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradientShift 3s ease infinite; }
+  .toast.error { border-color: rgba(239,68,68,0.8); }
 </style>
 </head>
 <body>
 
-<div id="screen-chat" class="screen active">
-  <div class="header"><h1>ByratGPT</h1><p>Neural Network · Online</p></div>
-  <div class="chat-area" id="chat-area">
-    <div class="empty-state" id="chat-empty">Начни диалог — просто напиши вопрос ниже</div>
-  </div>
-  <div class="input-bar">
-    <input type="text" id="chat-input" placeholder="Введи сообщение..." autocomplete="off" maxlength="500">
-    <button class="send-btn" id="send-btn" onclick="sendMessage()">➤</button>
-  </div>
+<div id="screen-main" class="screen active">
+  <div class="header"><h1>Byrat Shop</h1><p>✦ Premium Store ✦</p></div>
+  <button class="btn btn-hero" onclick="showScreen('screen-menu')">
+    <div class="btn-text">
+      <span class="btn-title">НАЧАТЬ</span>
+      <span class="btn-sub" style="color: rgba(255,255,255,0.9);">ОТКРЫТЬ МАГАЗИН</span>
+    </div>
+  </button>
 </div>
 
-<div id="screen-main" class="screen">
-  <div class="header"><h1>Магазин</h1><p>ByratShop</p></div>
-  <div class="container">
-    <div class="shop-tabs">
-      <button class="shop-tab active" onclick="showTab('tg', this)">📱 Аккаунты</button>
-      <button class="shop-tab" onclick="showTab('dota', this)">🎮 Сетки Dota</button>
+<div id="screen-menu" class="screen">
+  <div class="header"><h1>Магазин</h1><p>Выбери категорию</p></div>
+  <div class="categories">
+    <div class="category tg" onclick="showScreen('screen-shop-tg')">
+      <div class="category-icon">📱</div>
+      <div class="category-title">Аккаунты<br>TG</div>
+      <div class="category-sub">TData + Auth Key</div>
     </div>
-    <div id="tab-tg">
-      <div class="shop-item" onclick="buyItem('usa', 100)">
-        <div class="shop-flag">🇺🇸</div>
-        <div class="shop-info"><div class="shop-name">США</div><div class="shop-code">+1</div></div>
-        <div class="shop-price">100 ⭐</div>
-      </div>
-      <div class="shop-item" onclick="buyItem('canada', 100)">
-        <div class="shop-flag">🇨🇦</div>
-        <div class="shop-info"><div class="shop-name">Канада</div><div class="shop-code">+1</div></div>
-        <div class="shop-price">100 ⭐</div>
-      </div>
-      <div class="shop-item" onclick="buyItem('belarus', 170)">
-        <div class="shop-flag">🇧🇾</div>
-        <div class="shop-info"><div class="shop-name">Беларусь</div><div class="shop-code">+375</div></div>
-        <div class="shop-price">170 ⭐</div>
-      </div>
-      <div class="shop-item" onclick="buyItem('russia', 170)">
-        <div class="shop-flag">🇷🇺</div>
-        <div class="shop-info"><div class="shop-name">Россия</div><div class="shop-code">+7</div></div>
-        <div class="shop-price">170 ⭐</div>
-      </div>
-      <div class="shop-item" onclick="buyItem('ukraine', 170)">
-        <div class="shop-flag">🇺🇦</div>
-        <div class="shop-info"><div class="shop-name">Украина</div><div class="shop-code">+380</div></div>
-        <div class="shop-price">170 ⭐</div>
-      </div>
-      <div class="shop-item" onclick="buyItem('france', 150)">
-        <div class="shop-flag">🇫🇷</div>
-        <div class="shop-info"><div class="shop-name">Франция</div><div class="shop-code">+33</div></div>
-        <div class="shop-price">150 ⭐</div>
-      </div>
-      <div class="shop-item" onclick="buyItem('poland', 150)">
-        <div class="shop-flag">🇵🇱</div>
-        <div class="shop-info"><div class="shop-name">Польша</div><div class="shop-code">+48</div></div>
-        <div class="shop-price">150 ⭐</div>
-      </div>
-      <div class="shop-item" onclick="buyItem('pakistan', 130)">
-        <div class="shop-flag">🇵🇰</div>
-        <div class="shop-info"><div class="shop-name">Пакистан</div><div class="shop-code">+92</div></div>
-        <div class="shop-price">130 ⭐</div>
-      </div>
-      <div class="shop-item" onclick="buyItem('italy', 150)">
-        <div class="shop-flag">🇮🇹</div>
-        <div class="shop-info"><div class="shop-name">Италия</div><div class="shop-code">+39</div></div>
-        <div class="shop-price">150 ⭐</div>
-      </div>
-      <div class="shop-item" onclick="buyItem('myanmar', 120)">
-        <div class="shop-flag">🇲🇲</div>
-        <div class="shop-info"><div class="shop-name">Мьянма</div><div class="shop-code">+95</div></div>
-        <div class="shop-price">120 ⭐</div>
-      </div>
-      <div class="shop-item vip" onclick="buyItem('vip', 500)">
-        <div class="shop-flag">💎</div>
-        <div class="shop-info"><div class="shop-name">Анонимный</div><div class="shop-code">+888 ✨ VIP</div></div>
-        <div class="shop-price vip-price">500 ⭐</div>
-      </div>
-    </div>
-    <div id="tab-dota" style="display:none;">
-      <div class="shop-item" onclick="buyDota()">
-        <div class="shop-flag">🎨</div>
-        <div class="shop-info"><div class="shop-name">CFG-сетка из фото</div><div class="shop-code">Кастомная сетка</div></div>
-        <div class="shop-price">150 ⭐</div>
-      </div>
+    <div class="category dota" onclick="showScreen('screen-shop-dota')">
+      <div class="category-icon">🎮</div>
+      <div class="category-title">Сетки<br>Dota</div>
+      <div class="category-sub">CFG из фото</div>
     </div>
   </div>
+  <div class="shared-balance-note">⭐ Баланс общий для аккаунтов и сеток доты</div>
+</div>
+
+<div id="screen-shop-tg" class="screen">
+  <div class="header"><h1>Аккаунты TG</h1><p>Доступные аккаунты</p></div>
+
+  <div class="shop-item" onclick="buy('usa')">
+    <div class="shop-flag">🇺🇸</div>
+    <div class="shop-info"><div class="shop-name">США</div><div class="shop-code">+1</div></div>
+    <div class="shop-price">100 ⭐</div>
+  </div>
+  <div class="shop-item" onclick="buy('canada')">
+    <div class="shop-flag">🇨🇦</div>
+    <div class="shop-info"><div class="shop-name">Канада</div><div class="shop-code">+1</div></div>
+    <div class="shop-price">100 ⭐</div>
+  </div>
+  <div class="shop-item" onclick="buy('belarus')">
+    <div class="shop-flag">🇧🇾</div>
+    <div class="shop-info"><div class="shop-name">Беларусь</div><div class="shop-code">+375</div></div>
+    <div class="shop-price">170 ⭐</div>
+  </div>
+  <div class="shop-item" onclick="buy('russia')">
+    <div class="shop-flag">🇷🇺</div>
+    <div class="shop-info"><div class="shop-name">Россия</div><div class="shop-code">+7</div></div>
+    <div class="shop-price">170 ⭐</div>
+  </div>
+  <div class="shop-item" onclick="buy('ukraine')">
+    <div class="shop-flag">🇺🇦</div>
+    <div class="shop-info"><div class="shop-name">Украина</div><div class="shop-code">+380</div></div>
+    <div class="shop-price">170 ⭐</div>
+  </div>
+  <div class="shop-item" onclick="buy('france')">
+    <div class="shop-flag">🇫🇷</div>
+    <div class="shop-info"><div class="shop-name">Франция</div><div class="shop-code">+33</div></div>
+    <div class="shop-price">150 ⭐</div>
+  </div>
+  <div class="shop-item" onclick="buy('poland')">
+    <div class="shop-flag">🇵🇱</div>
+    <div class="shop-info"><div class="shop-name">Польша</div><div class="shop-code">+48</div></div>
+    <div class="shop-price">150 ⭐</div>
+  </div>
+  <div class="shop-item" onclick="buy('pakistan')">
+    <div class="shop-flag">🇵🇰</div>
+    <div class="shop-info"><div class="shop-name">Пакистан</div><div class="shop-code">+92</div></div>
+    <div class="shop-price">130 ⭐</div>
+  </div>
+  <div class="shop-item" onclick="buy('italy')">
+    <div class="shop-flag">🇮🇹</div>
+    <div class="shop-info"><div class="shop-name">Италия</div><div class="shop-code">+39</div></div>
+    <div class="shop-price">150 ⭐</div>
+  </div>
+  <div class="shop-item" onclick="buy('myanmar')">
+    <div class="shop-flag">🇲🇲</div>
+    <div class="shop-info"><div class="shop-name">Мьянма</div><div class="shop-code">+95</div></div>
+    <div class="shop-price">120 ⭐</div>
+  </div>
+
+  <div class="shop-item vip" onclick="buy('vip')">
+    <div class="shop-flag">💎</div>
+    <div class="shop-info"><div class="shop-name">Анонимный</div><div class="shop-code">+888 ✨ VIP</div></div>
+    <div class="shop-price">500 ⭐</div>
+  </div>
+
+  <button class="back-btn" onclick="showScreen('screen-menu')">← Назад</button>
+</div>
+
+<div id="screen-shop-dota" class="screen">
+  <div class="header"><h1>Сетки Dota</h1><p>CFG из твоего фото</p></div>
+  <div class="dota-card">
+    <div class="dota-icon">🎨</div>
+    <div class="dota-title">CFG-сетка из фото</div>
+    <div class="dota-desc">Получи редактор, сделай сетку из своего фото и закинь в Dota 2</div>
+    <div class="dota-price">150 ⭐</div>
+    <button class="dota-buy" onclick="buyCfg()">ЗАКАЗАТЬ</button>
+  </div>
+  <button class="back-btn" onclick="showScreen('screen-menu')">← Назад</button>
 </div>
 
 <div id="screen-balance" class="screen">
   <div class="header"><h1>Баланс</h1><p>Общий счёт</p></div>
-  <div class="container">
-    <div class="card"><div class="balance-label">Доступно запросов</div><div class="balance-num" id="balance-num">0</div><div style="font-size: 22px; margin-top: 6px;">⭐</div></div>
-    <div class="card"><div class="balance-label">Бесплатно сегодня</div><div style="font-size: 28px; font-weight: 900;" id="free-num">0/3</div></div>
-    <button class="btn ghost" onclick="showScreen('screen-promo')">🎟 Активировать промокод</button>
+  <div class="balance-card">
+    <div class="balance-label">Доступно</div>
+    <div class="balance-num" id="balance-display">0<span class="balance-star">⭐</span></div>
   </div>
+  <div class="shared-balance-note">⭐ Баланс общий для аккаунтов и сеток</div>
+  <button class="back-btn" onclick="showScreen('screen-menu')">← Назад</button>
+</div>
+
+<div id="screen-topup" class="screen">
+  <div class="header"><h1>Пополнение</h1><p>Выбери сумму</p></div>
+  <div class="topup-grid">
+    <button class="topup-btn" onclick="payStars(10)"><span class="topup-amount">10</span><span class="topup-star">⭐</span></button>
+    <button class="topup-btn" onclick="payStars(20)"><span class="topup-amount">20</span><span class="topup-star">⭐</span></button>
+    <button class="topup-btn" onclick="payStars(50)"><span class="topup-amount">50</span><span class="topup-star">⭐</span></button>
+    <button class="topup-btn" onclick="payStars(100)"><span class="topup-amount">100</span><span class="topup-star">⭐</span></button>
+    <button class="topup-btn" onclick="payStars(150)"><span class="topup-amount">150</span><span class="topup-star">⭐</span></button>
+    <button class="topup-btn" onclick="payStars(300)"><span class="topup-amount">300</span><span class="topup-star">⭐</span></button>
+  </div>
+  <button class="btn" onclick="showScreen('screen-promo')" style="justify-content: center; background: rgba(251,191,36,0.15); border-color: rgba(251,191,36,0.5);">
+    <div class="btn-text" style="align-items: center;"><span class="btn-title">🎁 Пополнить промокодом</span></div>
+  </button>
+  <button class="back-btn" onclick="showScreen('screen-menu')">← Назад</button>
 </div>
 
 <div id="screen-promo" class="screen">
   <div class="header"><h1>Промокод</h1><p>Введи код</p></div>
-  <div class="container">
-    <input type="text" id="promo-input" class="promo-input" placeholder="КОД" maxlength="20">
-    <button class="btn" onclick="activatePromo()">✅ Активировать</button>
-    <button class="btn ghost" onclick="showScreen('screen-balance')">← Назад</button>
-  </div>
+  <input type="text" id="promo-input" class="promo-input" placeholder="КОД" maxlength="20">
+  <button class="btn" onclick="activatePromo()" style="justify-content: center; background: linear-gradient(135deg, #8b5cf6, #d946ef); border: none;">
+    <div class="btn-text" style="align-items: center;"><span class="btn-title">✅ АКТИВИРОВАТЬ</span></div>
+  </button>
+  <button class="back-btn" onclick="showScreen('screen-menu')">← Назад</button>
 </div>
 
 <div id="screen-help" class="screen">
   <div class="header"><h1>Помощь</h1><p>Связаться с нами</p></div>
-  <div class="container">
-    <div class="card">
-      <div style="font-size: 56px; margin-bottom: 16px;">💬</div>
-      <div style="font-size: 14px; color: var(--text-dim); margin-bottom: 10px;">Поддержка</div>
-      <div style="font-size: 13px; color: var(--text-dim); line-height: 1.7; margin-bottom: 14px;">🕐 Будни: 11:00 – 20:00<br>🕐 Выходные: 12:00 – 19:00<br><br>⚠️ Если не ответили — продублируйте</div>
-      <a href="https://t.me/ownerByrat_Shop" target="_blank" class="help-link">@ownerByrat_Shop</a>
-    </div>
+  <div class="help-card">
+    <div style="font-size: 56px; margin-bottom: 16px; animation: iconFloat 3s ease-in-out infinite;">💬</div>
+    <div style="font-size: 15px; color: var(--text-dim); margin-bottom: 12px;">По всем вопросам пишите</div>
+    <a href="https://t.me/ownerByrat_Shop" target="_blank" class="help-link">@ownerByrat_Shop</a>
   </div>
+  <button class="back-btn" onclick="showScreen('screen-menu')">← Назад</button>
 </div>
 
-<div class="nav">
-  <button class="nav-btn active" data-screen="screen-chat" onclick="showScreen('screen-chat')"><span class="nav-icon">💬</span><span>Чат</span></button>
-  <button class="nav-btn" data-screen="screen-main" onclick="showScreen('screen-main')"><span class="nav-icon">🛒</span><span>Магазин</span></button>
+<div class="nav" id="nav" style="display: none;">
+  <button class="nav-btn" data-screen="screen-menu" onclick="showScreen('screen-menu')"><span class="nav-icon">🏠</span><span>Главная</span></button>
+  <button class="nav-btn" data-screen="screen-shop-tg" onclick="showScreen('screen-shop-tg')"><span class="nav-icon">📱</span><span>TG</span></button>
+  <button class="nav-btn" data-screen="screen-shop-dota" onclick="showScreen('screen-shop-dota')"><span class="nav-icon">🎮</span><span>Dota</span></button>
   <button class="nav-btn" data-screen="screen-balance" onclick="showScreen('screen-balance')"><span class="nav-icon">💰</span><span>Баланс</span></button>
-  <button class="nav-btn" data-screen="screen-help" onclick="showScreen('screen-help')"><span class="nav-icon">🆘</span><span>Помощь</span></button>
+  <button class="nav-btn" data-screen="screen-help" onclick="showScreen('screen-help')"><span class="nav-icon">❓</span><span>Помощь</span></button>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-  if (window.Telegram && Telegram.WebApp) {
-    Telegram.WebApp.ready();
-    Telegram.WebApp.expand();
-    Telegram.WebApp.setHeaderColor('#0a0a0a');
-    Telegram.WebApp.setBackgroundColor('#0a0a0a');
+  Telegram.WebApp.ready();
+  Telegram.WebApp.expand();
+
+  var API_BASE = "https://my-telegram-bot.kakebeska.workers.dev";
+  var urlParams = new URLSearchParams(window.location.search);
+  var userId = urlParams.get('user_id') || (Telegram.WebApp.initDataUnsafe.user ? Telegram.WebApp.initDataUnsafe.user.id : null);
+
+  var symbols = ["$", "⭐", "💎", "✦"];
+  var colors = ["#10b981", "#fbbf24", "#22d3ee", "#d946ef"];
+  for (var i = 0; i < 20; i++) {
+    var p = document.createElement('div');
+    p.className = 'particle';
+    p.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+    p.style.color = colors[Math.floor(Math.random() * colors.length)];
+    p.style.left = Math.random() * 100 + '%';
+    p.style.top = Math.random() * 100 + 'vh';
+    p.style.fontSize = (12 + Math.random() * 18) + 'px';
+    var dur = 10 + Math.random() * 15;
+    p.style.animationDuration = dur + 's';
+    p.style.animationDelay = '-' + (Math.random() * dur) + 's';
+    p.style.opacity = 0.3 + Math.random() * 0.5;
+    document.body.appendChild(p);
   }
 
-  const API_BASE = "https://byrat-gpt.kakebeska.workers.dev";
-  let userId = null;
-  try {
-    if (window.Telegram && Telegram.WebApp) {
-      if (Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user) {
-        userId = Telegram.WebApp.initDataUnsafe.user.id;
-      } else if (Telegram.WebApp.initData) {
-        const params = new URLSearchParams(Telegram.WebApp.initData);
-        const u = params.get('user');
-        if (u) userId = JSON.parse(u).id;
-      }
-    }
-  } catch (e) {}
-
-  let isSending = false;
-
   function showScreen(id) {
-    const current = document.querySelector('.screen.active');
-    const next = document.getElementById(id);
-    if (current === next) return;
-    if (current) {
-      current.classList.remove('active');
-      current.classList.add('leaving');
-      setTimeout(() => current.classList.remove('leaving'), 380);
+    var screens = document.querySelectorAll('.screen');
+    for (var i = 0; i < screens.length; i++) screens[i].classList.remove('active');
+    document.getElementById(id).classList.add('active');
+
+    var navButtons = document.querySelectorAll('.nav-btn');
+    for (var j = 0; j < navButtons.length; j++) {
+      if (navButtons[j].dataset.screen === id) navButtons[j].classList.add('active');
+      else navButtons[j].classList.remove('active');
     }
-    next.classList.remove('leaving');
-    next.classList.add('active');
-    document.querySelectorAll('.nav-btn').forEach(b => {
-      b.classList.toggle('active', b.dataset.screen === id);
-    });
+
+    var nav = document.getElementById('nav');
+    if (id === 'screen-main') nav.style.display = 'none';
+    else nav.style.display = 'flex';
+
     if (id === 'screen-balance') loadBalance();
   }
 
   function showToast(text, type) {
-    const t = document.getElementById('toast');
+    var t = document.getElementById('toast');
     t.textContent = text;
     t.className = 'toast show ' + (type || '');
-    setTimeout(() => t.className = 'toast ' + (type || ''), 3000);
+    setTimeout(function() { t.className = 'toast ' + (type || ''); }, 3500);
   }
 
-  function showTab(tab, btn) {
-    document.querySelectorAll('.shop-tab').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('tab-tg').style.display = tab === 'tg' ? 'block' : 'none';
-    document.getElementById('tab-dota').style.display = tab === 'dota' ? 'block' : 'none';
-  }
-
-  async function loadBalance() {
-    const n = document.getElementById('balance-num');
-    const f = document.getElementById('free-num');
-    if (!userId) { n.textContent = '0'; f.textContent = '0/3'; return; }
-    try {
-      const r = await fetch(API_BASE + '/api/balance?user_id=' + userId);
-      const d = await r.json();
-      n.textContent = d.balance || 0;
-      f.textContent = (d.free || 0) + '/3';
-    } catch (e) {}
-  }
-
-  async function activatePromo() {
-    const i = document.getElementById('promo-input');
-    const c = i.value.trim();
-    if (!c) { showToast('Введи промокод', 'error'); return; }
-    try {
-      const r = await fetch(API_BASE + '/api/promo?user_id=' + userId + '&code=' + encodeURIComponent(c));
-      const d = await r.json();
-      showToast(d.message, d.ok ? 'success' : 'error');
-      if (d.ok) { i.value = ''; loadBalance(); }
-    } catch (e) { showToast('Ошибка', 'error'); }
-  }
-
-  async function buyItem(code, price) {
-    if (!userId) { showToast('Открой через Telegram', 'error'); return; }
-    const countryNames = {
-      usa: 'США', canada: 'Канада', belarus: 'Беларусь', russia: 'Россия',
-      ukraine: 'Украина', france: 'Франция', poland: 'Польша', pakistan: 'Пакистан',
-      italy: 'Италия', myanmar: 'Мьянма', vip: 'VIP Анонимный'
+  function loadBalance() {
+    var display = document.getElementById('balance-display');
+    display.innerHTML = '...<span class="balance-star">⭐</span>';
+    if (!userId) { display.innerHTML = '0<span class="balance-star">⭐</span>'; return; }
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', API_BASE + '/api/balance?user_id=' + userId, true);
+    xhr.timeout = 8000;
+    xhr.onload = function() {
+      try { var data = JSON.parse(xhr.responseText); display.innerHTML = data.balance + '<span class="balance-star">⭐</span>'; }
+      catch (e) { display.innerHTML = '0<span class="balance-star">⭐</span>'; }
     };
-    showToast(`Товар: ${countryNames[code] || code} — ${price} ⭐`, 'success');
+    xhr.onerror = function() { display.innerHTML = '0<span class="balance-star">⭐</span>'; };
+    xhr.ontimeout = function() { display.innerHTML = '0<span class="balance-star">⭐</span>'; };
+    xhr.send();
+  }
+
+  function activatePromo() {
+    var input = document.getElementById('promo-input');
+    var code = input.value.trim();
+    if (!code) { showToast('Введи промокод', 'error'); return; }
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', API_BASE + '/api/promo?user_id=' + userId + '&code=' + encodeURIComponent(code), true);
+    xhr.timeout = 8000;
+    xhr.onload = function() {
+      try { var data = JSON.parse(xhr.responseText); showToast(data.message, data.ok ? 'success' : 'error'); if (data.ok) { input.value = ''; loadBalance(); } }
+      catch (e) { showToast('Ошибка ответа', 'error'); }
+    };
+    xhr.onerror = function() { showToast('Ошибка соединения', 'error'); };
+    xhr.send();
+  }
+
+  function payStars(amount) {
+    Telegram.WebApp.sendData(JSON.stringify({ action: 'pay', amount: amount }));
+    Telegram.WebApp.close();
+  }
+
+  function buy(country) {
     if (Telegram.WebApp) {
-      Telegram.WebApp.sendData(JSON.stringify({ action: 'buy', item: code, price: price }));
-      setTimeout(() => Telegram.WebApp.close(), 500);
+      Telegram.WebApp.sendData(JSON.stringify({ action: 'buy', item: country }));
+      Telegram.WebApp.close();
     }
   }
 
-  async function buyDota() {
-    showToast('Заказ: CFG-сетка Dota', 'success');
+  function buyCfg() {
     if (Telegram.WebApp) {
-      Telegram.WebApp.sendData(JSON.stringify({ action: 'buy', item: 'dota_cfg', price: 150 }));
-      setTimeout(() => Telegram.WebApp.close(), 500);
+      Telegram.WebApp.sendData(JSON.stringify({ action: 'buy', item: 'dota_cfg' }));
+      Telegram.WebApp.close();
     }
   }
 
-  async function loadHistory() {
-    if (!userId) return;
-    try {
-      const r = await fetch(API_BASE + '/api/history?user_id=' + userId);
-      const d = await r.json();
-      if (d.ok && d.history && d.history.length > 0) {
-        document.getElementById('chat-empty').style.display = 'none';
-        for (const m of d.history) addMessage(m.content, m.role === 'user' ? 'user' : 'bot');
-      }
-    } catch (e) {}
-  }
-
-  function addMessage(text, role) {
-    const a = document.getElementById('chat-area');
-    const e = document.getElementById('chat-empty');
-    if (e) e.style.display = 'none';
-    const d = document.createElement('div');
-    d.className = 'msg ' + role;
-    d.textContent = text;
-    a.appendChild(d);
-    a.scrollTop = a.scrollHeight;
-    return d;
-  }
-
-  async function sendMessage() {
-    if (isSending) return;
-    const inp = document.getElementById('chat-input');
-    const text = inp.value.trim();
-    if (!text) return;
-    if (!userId) { showToast('Открой через Telegram', 'error'); return; }
-
-    inp.value = '';
-    addMessage(text, 'user');
-    isSending = true;
-    const btn = document.getElementById('send-btn');
-    btn.disabled = true;
-
-    const botDiv = addMessage('', 'bot');
-    botDiv.classList.add('typing-cursor');
-    botDiv.textContent = '🧠 Думаю...';
-
-    try {
-      const r = await fetch(API_BASE + '/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId, text: text })
-      });
-
-      const data = await r.json();
-
-      botDiv.classList.remove('typing-cursor');
-
-      if (!data.ok) {
-        botDiv.textContent = '❌ ' + (data.error || 'Ошибка');
-        botDiv.classList.add('error');
-        isSending = false; btn.disabled = false;
-        return;
-      }
-
-      botDiv.textContent = data.reply;
-
-    } catch (e) {
-      botDiv.classList.remove('typing-cursor');
-      botDiv.textContent = '❌ ' + e.message;
-      botDiv.classList.add('error');
-    }
-
-    isSending = false; btn.disabled = false;
-    loadBalance();
-  }
-
-  const ci = document.getElementById('chat-input');
-  if (ci) ci.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
-
-  showScreen('screen-chat');
-  if (userId) { loadBalance(); loadHistory(); }
+  showScreen('screen-main');
 </script>
 </body>
 </html>
