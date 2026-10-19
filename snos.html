@@ -64,7 +64,7 @@
   <div id="screen-main" class="screen active">
     <div class="header"><h1>💀 СНОС</h1><p>BLACK MARKET TERMINAL</p></div>
     <div class="balance-card">
-      <div class="balance-label">ОБЩИЙ БАЛАНС</div>
+      <div class="balance-label">БАЛАНС</div>
       <div class="balance-num" id="balance-num">0 ⭐</div>
     </div>
     <button class="btn danger" onclick="showScreen('screen-snos')">💀 ЗАПУСТИТЬ СНОС</button>
@@ -93,9 +93,13 @@
       <div class="balance-label">ТЕКУЩИЙ БАЛАНС</div>
       <div class="balance-num" id="balance-num-2">0 ⭐</div>
     </div>
+    <!-- Обновленные кнопки пополнения -->
+    <button class="btn" onclick="payStars(10)">10 ⭐</button>
+    <button class="btn" onclick="payStars(20)">20 ⭐</button>
+    <button class="btn" onclick="payStars(50)">50 ⭐</button>
     <button class="btn" onclick="payStars(100)">100 ⭐</button>
-    <button class="btn" onclick="payStars(200)">200 ⭐</button>
-    <button class="btn" onclick="payStars(500)">500 ⭐</button>
+    <button class="btn" onclick="payStars(150)">150 ⭐</button>
+    <button class="btn" onclick="payStars(300)">300 ⭐</button>
   </div>
 
   <div id="screen-price" class="screen">
@@ -118,7 +122,7 @@
 </div>
 
 <script>
-  // Защита от браузера
+  // Защита от открытия в браузере
   if (!window.Telegram || !Telegram.WebApp || !Telegram.WebApp.initDataUnsafe.user) {
     document.getElementById('browser-block').style.display = 'flex';
   } else {
@@ -150,8 +154,8 @@
       const type = document.getElementById('snos-type').value;
       if (!target) { showToast('Введите @username', 'error'); return; }
 
-      const confirmMsg = `⚠️ ВЫ УВЕРЕНЫ?\n\nЦель: ${target}\nТип: ${type}\n\nНажмите OK для запуска.`;
-      if (!confirm(confirmMsg)) return;
+      // Встроенный confirm, чтобы не банилось в Telegram
+      if (!confirm(`⚠️ ВЫ УВЕРЕНЫ?\n\nЦель: ${target}\nТип: ${type}\n\nНажмите OK для запуска.`)) return;
 
       const progress = document.getElementById('progress');
       progress.textContent = `[!] ОТПРАВКА ЗАПРОСА НА СЕРВЕР...`;
@@ -191,7 +195,7 @@
         loadBalance(); 
 
       } catch(e) {
-        showToast('Ошибка сети', 'error');
+        showToast('Ошибка сети. Попробуйте позже.', 'error');
         progress.textContent = "Ошибка сети. Проверьте подключение.";
       }
     }
