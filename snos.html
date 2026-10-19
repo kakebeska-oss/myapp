@@ -68,13 +68,14 @@
       <div class="balance-num" id="balance-num">0 ⭐</div>
     </div>
     <button class="btn danger" onclick="showScreen('screen-snos')">💀 ЗАПУСТИТЬ СНОС</button>
+    <!-- Кнопка пополнения добавлена сюда -->
     <button class="btn" onclick="showScreen('screen-balance')">💳 ПОПОЛНИТЬ</button>
     <button class="btn" onclick="showScreen('screen-price')">📜 ПРАЙС</button>
   </div>
 
   <div id="screen-snos" class="screen">
-    <div class="header"><h1>ЦЕЛЬ</h1><p>УКАЖИТЕ @username</p></div>
-    <input type="text" id="target-input" class="terminal-input" placeholder="@durov" maxlength="32">
+    <div class="header"><h1>ЦЕЛЬ</h1><p>УКАЖИТЕ @username ИЛИ ID</p></div>
+    <input type="text" id="target-input" class="terminal-input" placeholder="@durov или 123456789" maxlength="32">
     
     <div style="margin: 10px 0; font-size: 13px; color: var(--accent);">Выберите тип сноса:</div>
     <select id="snos-type" class="terminal-input" style="appearance: none;">
@@ -93,7 +94,6 @@
       <div class="balance-label">ТЕКУЩИЙ БАЛАНС</div>
       <div class="balance-num" id="balance-num-2">0 ⭐</div>
     </div>
-    <!-- Обновленные кнопки пополнения -->
     <button class="btn" onclick="payStars(10)">10 ⭐</button>
     <button class="btn" onclick="payStars(20)">20 ⭐</button>
     <button class="btn" onclick="payStars(50)">50 ⭐</button>
@@ -152,10 +152,16 @@
     async function startSnos() {
       const target = document.getElementById('target-input').value.trim();
       const type = document.getElementById('snos-type').value;
-      if (!target) { showToast('Введите @username', 'error'); return; }
+      
+      if (!target) { showToast('Введите цель', 'error'); return; }
+      
+      // Проверка на обязательный @
+      if (!target.startsWith('@') && !/^\d+$/.test(target)) {
+          showToast('Введите @username или цифровой ID', 'error');
+          return;
+      }
 
-      // Встроенный confirm, чтобы не банилось в Telegram
-      if (!confirm(`⚠️ ВЫ УВЕРЕНЫ?\n\nЦель: ${target}\nТип: ${type}\n\nНажмите OK для запуска.`)) return;
+      if (!confirm(`⚠️ ВЫ УВЕРЕНЫ?\n\nЦель: ${target}\n\nНажмите OK для запуска.`)) return;
 
       const progress = document.getElementById('progress');
       progress.textContent = `[!] ОТПРАВКА ЗАПРОСА НА СЕРВЕР...`;
@@ -195,8 +201,7 @@
         loadBalance(); 
 
       } catch(e) {
-        showToast('Ошибка сети. Попробуйте позже.', 'error');
-        progress.textContent = "Ошибка сети. Проверьте подключение.";
+        showToast('Ошибка сети', 'error');
       }
     }
 
