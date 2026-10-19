@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ТЕРМИНАЛ СНОСА</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --bg: #0a0f0a;
+    --accent: #00ff41;
+    --accent-dim: rgba(0, 255, 65, 0.15);
+    --red: #ff003c;
+    --glass: rgba(0, 255, 65, 0.05);
+    --border: rgba(0, 255, 65, 0.3);
+    --text: #00ff41;
+    --text-dim: rgba(0, 255, 65, 0.5);
+  }
+  html, body { width: 100%; overflow-x: hidden; background: var(--bg); }
+  body { font-family: 'Courier New', monospace; color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+  .screen { display: none; padding: 20px 16px 100px; flex: 1; flex-direction: column; }
+  .screen.active { display: flex; }
+  .header { text-align: center; margin-bottom: 20px; }
+  .header h1 { font-size: 28px; font-weight: 900; letter-spacing: 2px; color: var(--accent); text-shadow: 0 0 10px var(--accent); margin-bottom: 8px; }
+  .header p { font-size: 11px; color: var(--text-dim); letter-spacing: 3px; text-transform: uppercase; }
+  
+  .btn { background: var(--glass); border: 1px solid var(--border); color: var(--text); padding: 16px; font-size: 15px; font-family: inherit; border-radius: 8px; cursor: pointer; text-align: center; width: 100%; margin: 6px 0; transition: all 0.2s; }
+  .btn:active { background: var(--accent-dim); transform: scale(0.97); }
+  .btn.danger { border-color: var(--red); color: var(--red); }
+  .btn.danger:active { background: rgba(255, 0, 60, 0.1); }
+
+  .balance-card { background: var(--glass); border: 1px solid var(--border); border-radius: 16px; padding: 24px; text-align: center; margin: 20px 0; }
+  .balance-label { font-size: 11px; color: var(--text-dim); letter-spacing: 3px; margin-bottom: 8px; }
+  .balance-num { font-size: 48px; font-weight: 900; color: var(--accent); text-shadow: 0 0 15px var(--accent); }
+
+  .nav { position: fixed; bottom: 0; left: 0; right: 0; background: #0a0f0a; border-top: 1px solid var(--border); display: flex; padding: 8px; z-index: 100; }
+  .nav-btn { flex: 1; background: transparent; border: none; color: var(--text-dim); padding: 10px; font-size: 11px; font-family: inherit; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .nav-btn.active { color: var(--accent); }
+  .nav-btn .nav-icon { font-size: 20px; }
+
+  .terminal-input { width: 100%; padding: 16px; background: #000; border: 1px solid var(--border); color: var(--text); font-family: inherit; font-size: 15px; border-radius: 8px; outline: none; margin: 12px 0; text-align: center; }
+  .terminal-input:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(0, 255, 65, 0.3); }
+  
+  .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #000; border: 1px solid var(--accent); padding: 14px 20px; border-radius: 8px; color: var(--accent); font-size: 13px; opacity: 0; transition: all 0.3s; z-index: 1000; max-width: 90%; text-align: center; }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+</style>
+</head>
+<body>
+
+<!-- Главная (Мини-апп) -->
+<div id="screen-main" class="screen active">
+  <div class="header">
+    <h1>💀 СНОС</h1>
+    <p>BLACK MARKET TERMINAL</p>
+  </div>
+  <div class="balance-card">
+    <div class="balance-label">БАЛАНС</div>
+    <div class="balance-num" id="balance-num">0 ⭐</div>
+  </div>
+  <button class="btn danger" onclick="showScreen('screen-snos')">💀 ЗАПУСТИТЬ СНОС</button>
+  <button class="btn" onclick="showScreen('screen-balance')">💳 ПОПОЛНИТЬ</button>
+  <button class="btn" onclick="showScreen('screen-price')">📜 ПРАЙС</button>
+</div>
+
+<!-- Снос -->
+<div id="screen-snos" class="screen">
+  <div class="header"><h1>ЦЕЛЬ</h1><p>УКАЖИТЕ @username</p></div>
+  <input type="text" id="target-input" class="terminal-input" placeholder="@durov" maxlength="32">
+  <button class="btn danger" onclick="startSnos()">💀 НАЧАТЬ</button>
+  <div id="progress" style="margin-top: 20px; font-size: 14px; white-space: pre-wrap; line-height: 1.6;"></div>
+</div>
+
+<!-- Баланс -->
+<div id="screen-balance" class="screen">
+  <div class="header"><h1>ПОПОЛНЕНИЕ</h1><p>ВЫБЕРИТЕ СУММУ</p></div>
+  <div class="balance-card">
+    <div class="balance-label">ТЕКУЩИЙ БАЛАНС</div>
+    <div class="balance-num" id="balance-num-2">0 ⭐</div>
+  </div>
+  <button class="btn" onclick="payStars(10)">10 ⭐</button>
+  <button class="btn" onclick="payStars(50)">50 ⭐</button>
+  <button class="btn" onclick="payStars(100)">100 ⭐</button>
+  <button class="btn" onclick="payStars(300)">300 ⭐</button>
+</div>
+
+<!-- Прайс -->
+<div id="screen-price" class="screen">
+  <div class="header"><h1>ПРАЙС</h1><p>ВСЕ СРЕДСТВА В BYRATSHOP</p></div>
+  <div style="background: var(--glass); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin: 10px 0; font-size: 14px;">
+    <p style="margin: 10px 0;">🔸 Снос аккаунта: <b>10 ⭐</b></p>
+    <p style="margin: 10px 0;">🔸 Полный снос: <b>50 ⭐</b></p>
+    <p style="margin: 10px 0;">🔸 Снос + лог: <b>150 ⭐</b></p>
+  </div>
+  <button class="btn" onclick="showScreen('screen-main')">🏠 НАЗАД</button>
+</div>
+
+<!-- Навигация -->
+<div class="nav">
+  <button class="nav-btn active" data-screen="screen-main" onclick="showScreen('screen-main')"><span class="nav-icon">💀</span>ГЛАВНАЯ</button>
+  <button class="nav-btn" data-screen="screen-snos" onclick="showScreen('screen-snos')"><span class="nav-icon">🎯</span>СНОС</button>
+  <button class="nav-btn" data-screen="screen-balance" onclick="showScreen('screen-balance')"><span class="nav-icon">💳</span>БАЛАНС</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  Telegram.WebApp.ready();
+  Telegram.WebApp.expand();
+
+  const API_BASE = "https://byrat-snos.твой-воркер.workers.dev"; // ЗАМЕНИТЬ
+  let userId = null;
+  try {
+    if (Telegram.WebApp.initDataUnsafe.user) userId = Telegram.WebApp.initDataUnsafe.user.id;
+    else if (Telegram.WebApp.initData) {
+      const params = new URLSearchParams(Telegram.WebApp.initData);
+      const u = params.get('user');
+      if (u) userId = JSON.parse(u).id;
+    }
+  } catch (e) {}
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.screen === id));
+    if (id === 'screen-main' || id === 'screen-balance') loadBalance();
+  }
+
+  function loadBalance() {
+    if (!userId) return;
+    fetch(API_BASE + '/api/balance?user_id=' + userId)
+      .then(r => r.json())
+      .then(d => {
+        document.getElementById('balance-num').textContent = (d.balance || 0) + ' ⭐';
+        document.getElementById('balance-num-2').textContent = (d.balance || 0) + ' ⭐';
+      }).catch(() => {});
+  }
+
+  async function startSnos() {
+    const target = document.getElementById('target-input').value.trim();
+    if (!target) { showToast('Введите @username', 'error'); return; }
+    const progress = document.getElementById('progress');
+    progress.textContent = `[!] ЦЕЛЬ ЗАХВАЧЕНА: ${target}\n[!] ЗАПУСК ПРОТОКОЛА SN#SS@KK@YNT@\n\n[░░░░░░░░░░] 0% — ИНИЦИАЛИЗАЦИЯ...`;
+
+    const steps = [10, 30, 50, 70, 90, 100];
+    for (let i = 0; i < steps.length; i++) {
+      await new Promise(r => setTimeout(r, 1600));
+      const p = steps[i];
+      const filled = Math.floor(p / 10);
+      const bar = '█'.repeat(filled) + '░'.repeat(10 - filled);
+      const label = p === 100 ? 'ЗАВЕРШЕНО' : p === 90 ? 'УДАЛЕНИЕ СЛЕДОВ' : p === 70 ? 'СЛИВ ДАННЫХ' : p === 50 ? 'ВНЕДРЕНИЕ' : p === 30 ? 'ОБХОД ЗАЩИТЫ' : 'ПОИСК УЯЗВИМОСТЕЙ';
+      progress.textContent = `[!] ЦЕЛЬ: ${target}\n[!] ПРОТОКОЛ SN#SS@KK@YNT@\n\n[${bar}] ${p}% — ${label}...`;
+    }
+
+    await new Promise(r => setTimeout(r, 500));
+    progress.textContent += `\n\n[██████████] 100% — СНОС ЗАВЕРШЕН.\n[!] ДАННЫЕ СЛИТЫ.\n\n(Это шутка. Бот создан для развлечения.)`;
+    showToast('Снос завершен! (Шутка)', 'success');
+  }
+
+  function payStars(amount) {
+    Telegram.WebApp.sendData(JSON.stringify({ action: 'pay', amount: amount }));
+    Telegram.WebApp.close();
+  }
+
+  function showToast(text, type) {
+    const t = document.getElementById('toast');
+    t.textContent = text;
+    t.className = 'toast show';
+    setTimeout(() => t.className = 'toast', 3000);
+  }
+
+  showScreen('screen-main');
+</script>
+</body>
+</html>
