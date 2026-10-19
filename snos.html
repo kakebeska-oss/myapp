@@ -88,9 +88,9 @@
 <div id="screen-price" class="screen">
   <div class="header"><h1>ПРАЙС</h1><p>ВСЕ СРЕДСТВА В BYRATSHOP</p></div>
   <div style="background: var(--glass); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin: 10px 0; font-size: 14px;">
-    <p style="margin: 10px 0;">🔸 Снос аккаунта: <b>10 ⭐</b></p>
-    <p style="margin: 10px 0;">🔸 Полный снос: <b>50 ⭐</b></p>
-    <p style="margin: 10px 0;">🔸 Снос + лог: <b>150 ⭐</b></p>
+    <p style="margin: 10px 0; color: var(--accent);">🔸 сн0$ аккаунт@ <b>100 ⭐</b></p>
+    <p style="margin: 10px 0; color: var(--accent);">🔸 полный сн0$ <b>150 ⭐</b></p>
+    <p style="margin: 10px 0; color: var(--accent);">🔸 полный сн0$ + л0ги <b>200 ⭐</b></p>
   </div>
   <button class="btn" onclick="showScreen('screen-main')">🏠 НАЗАД</button>
 </div>
@@ -108,7 +108,7 @@
   Telegram.WebApp.ready();
   Telegram.WebApp.expand();
 
-  const API_BASE = "https://byrat-snos.твой-воркер.workers.dev"; // ЗАМЕНИТЬ
+  const API_BASE = "https://byrat-snos.твой-воркер.workers.dev"; // ЗАМЕНИТЬ НА СВОЙ URL
   let userId = null;
   try {
     if (Telegram.WebApp.initDataUnsafe.user) userId = Telegram.WebApp.initDataUnsafe.user.id;
