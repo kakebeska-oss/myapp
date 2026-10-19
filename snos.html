@@ -6,7 +6,7 @@
 <title>ТЕРМИНАЛ СНОСА</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
   :root {
     --bg: #0a0f0a; --accent: #00ff41; --accent-dim: rgba(0, 255, 65, 0.15);
     --red: #ff003c; --glass: rgba(0, 255, 65, 0.05); --border: rgba(0, 255, 65, 0.3);
@@ -15,11 +15,7 @@
   html, body { width: 100%; overflow-x: hidden; background: var(--bg); height: 100%; }
   body { font-family: 'Courier New', monospace; color: var(--text); display: flex; flex-direction: column; position: relative; }
   
-  #browser-block {
-    position: fixed; inset: 0; background: #05050f; z-index: 9999;
-    display: none; flex-direction: column; justify-content: center; align-items: center;
-    text-align: center; padding: 20px;
-  }
+  #browser-block { position: fixed; inset: 0; background: #05050f; z-index: 9999; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
   #browser-block h1 { font-size: 24px; color: #ff2d2d; margin-bottom: 10px; text-shadow: 0 0 10px #ff2d2d; }
   #browser-block p { font-size: 16px; color: #fff; opacity: 0.8; line-height: 1.5; }
   #browser-block a { margin-top: 20px; display: inline-block; padding: 12px 24px; background: #ff2d2d; color: #fff; text-decoration: none; border-radius: 8px; font-weight: bold; }
@@ -30,7 +26,7 @@
   .header h1 { font-size: 28px; font-weight: 900; letter-spacing: 2px; color: var(--accent); text-shadow: 0 0 10px var(--accent); margin-bottom: 8px; }
   .header p { font-size: 11px; color: var(--text-dim); letter-spacing: 3px; text-transform: uppercase; }
   
-  .btn { background: var(--glass); border: 1px solid var(--border); color: var(--text); padding: 16px; font-size: 15px; font-family: inherit; border-radius: 8px; cursor: pointer; text-align: center; width: 100%; margin: 6px 0; transition: all 0.2s; }
+  .btn { background: var(--glass); border: 1px solid var(--border); color: var(--text); padding: 16px; font-size: 15px; font-family: inherit; border-radius: 8px; cursor: pointer; text-align: center; width: 100%; margin: 6px 0; transition: all 0.1s; text-decoration: none; display: block; box-sizing: border-box; pointer-events: auto; user-select: none; }
   .btn:active { background: var(--accent-dim); transform: scale(0.97); }
   .btn.danger { border-color: var(--red); color: var(--red); }
   .btn.danger:active { background: rgba(255, 0, 60, 0.1); }
@@ -40,14 +36,14 @@
   .balance-num { font-size: 48px; font-weight: 900; color: var(--accent); text-shadow: 0 0 15px var(--accent); }
 
   .nav { position: fixed; bottom: 0; left: 0; right: 0; background: #0a0f0a; border-top: 1px solid var(--border); display: flex; padding: 8px; z-index: 100; }
-  .nav-btn { flex: 1; background: transparent; border: none; color: var(--text-dim); padding: 10px; font-size: 11px; font-family: inherit; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .nav-btn { flex: 1; background: transparent; border: none; color: var(--text-dim); padding: 10px; font-size: 11px; font-family: inherit; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; pointer-events: auto; }
   .nav-btn.active { color: var(--accent); }
   .nav-btn .nav-icon { font-size: 20px; }
 
-  .terminal-input { width: 100%; padding: 16px; background: #000; border: 1px solid var(--border); color: var(--text); font-family: inherit; font-size: 15px; border-radius: 8px; outline: none; margin: 12px 0; text-align: center; }
+  .terminal-input { width: 100%; padding: 16px; background: #000; border: 1px solid var(--border); color: var(--text); font-family: inherit; font-size: 15px; border-radius: 8px; outline: none; margin: 12px 0; text-align: center; pointer-events: auto; }
   .terminal-input:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(0, 255, 65, 0.3); }
   
-  .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #000; border: 1px solid var(--accent); padding: 14px 20px; border-radius: 8px; color: var(--accent); font-size: 13px; opacity: 0; transition: all 0.3s; z-index: 1000; max-width: 90%; text-align: center; }
+  .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #000; border: 1px solid var(--accent); padding: 14px 20px; border-radius: 8px; color: var(--accent); font-size: 13px; opacity: 0; transition: all 0.3s; z-index: 1000; max-width: 90%; text-align: center; pointer-events: none; }
   .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
   .toast.error { border-color: var(--red); color: var(--red); }
 </style>
@@ -88,18 +84,15 @@
   </div>
 
   <div id="screen-balance" class="screen">
-    <div class="header"><h1>ПОПОЛНЕНИЕ</h1><p>ВЫБЕРИТЕ СУММУ</p></div>
+    <div class="header"><h1>ПОПОЛНЕНИЕ</h1><p>ЧЕРЕЗ МАГАЗИН</p></div>
     <div class="balance-card">
       <div class="balance-label">ТЕКУЩИЙ БАЛАНС</div>
       <div class="balance-num" id="balance-num-2">0 ⭐</div>
     </div>
-    <!-- ТЕ САМЫЕ 6 КНОПОК -->
-    <button class="btn" onclick="payStars(10)">10 ⭐</button>
-    <button class="btn" onclick="payStars(20)">20 ⭐</button>
-    <button class="btn" onclick="payStars(50)">50 ⭐</button>
-    <button class="btn" onclick="payStars(100)">100 ⭐</button>
-    <button class="btn" onclick="payStars(150)">150 ⭐</button>
-    <button class="btn" onclick="payStars(300)">300 ⭐</button>
+    <a href="https://t.me/ByratShop_bot" target="_blank" class="btn" style="border-color: #fbbf24; color: #fbbf24;">🛒 ПЕРЕЙТИ В МАГАЗИН</a>
+    <div style="font-size: 12px; color: var(--text-dim); text-align: center; margin-top: 10px;">
+      После пополнения в магазине баланс обновится здесь автоматически.
+    </div>
   </div>
 
   <div id="screen-price" class="screen">
@@ -122,7 +115,6 @@
 </div>
 
 <script>
-  // ПРОВЕРКА БРАУЗЕРА (срабатывает сразу)
   if (!window.Telegram || !Telegram.WebApp || !Telegram.WebApp.initDataUnsafe.user) {
     document.getElementById('browser-block').style.display = 'flex';
   } else {
@@ -130,7 +122,6 @@
     Telegram.WebApp.ready();
     Telegram.WebApp.expand();
     
-    // ЗАМЕНИ, ЕСЛИ URL ДРУГОЙ
     const API_BASE = "https://byrat-snos.kakebeska.workers.dev"; 
     let userId = Telegram.WebApp.initDataUnsafe.user.id;
 
@@ -140,6 +131,7 @@
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.screen === id));
       if (id === 'screen-main' || id === 'screen-balance') loadBalance();
     }
+    window.showScreen = showScreen; // Делаем доступным для onclick
 
     function loadBalance() {
       fetch(API_BASE + '/api/balance?user_id=' + userId)
@@ -156,14 +148,12 @@
       
       if (!target) { showToast('Введите цель', 'error'); return; }
       if (!target.startsWith('@') && !/^\d+$/.test(target)) {
-          showToast('Введите @username или цифровой ID', 'error');
+          showToast('Введите @username или ID', 'error');
           return;
       }
 
-      if (!confirm(`⚠️ ВЫ УВЕРЕНЫ?\n\nЦель: ${target}\n\nНажмите OK для запуска.`)) return;
-
       const progress = document.getElementById('progress');
-      progress.textContent = `[!] ОТПРАВКА ЗАПРОСА НА СЕРВЕР...`;
+      progress.textContent = `[!] ПРОВЕРКА ЦЕЛИ ${target}...`;
 
       try {
         const res = await fetch(`${API_BASE}/api/snos?user_id=${userId}&target=${target.replace('@', '')}&type=${type}`);
@@ -203,11 +193,7 @@
         showToast('Ошибка сети', 'error');
       }
     }
-
-    function payStars(amount) {
-      Telegram.WebApp.sendData(JSON.stringify({ action: 'pay', amount: amount }));
-      Telegram.WebApp.close();
-    }
+    window.startSnos = startSnos; // Делаем доступным для onclick
 
     function showToast(text, type) {
       const t = document.getElementById('toast');
