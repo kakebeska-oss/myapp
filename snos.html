@@ -8,14 +8,9 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   :root {
-    --bg: #0a0f0a;
-    --accent: #00ff41;
-    --accent-dim: rgba(0, 255, 65, 0.15);
-    --red: #ff003c;
-    --glass: rgba(0, 255, 65, 0.05);
-    --border: rgba(0, 255, 65, 0.3);
-    --text: #00ff41;
-    --text-dim: rgba(0, 255, 65, 0.5);
+    --bg: #0a0f0a; --accent: #00ff41; --accent-dim: rgba(0, 255, 65, 0.15);
+    --red: #ff003c; --glass: rgba(0, 255, 65, 0.05); --border: rgba(0, 255, 65, 0.3);
+    --text: #00ff41; --text-dim: rgba(0, 255, 65, 0.5);
   }
   html, body { width: 100%; overflow-x: hidden; background: var(--bg); }
   body { font-family: 'Courier New', monospace; color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
@@ -44,16 +39,14 @@
   
   .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #000; border: 1px solid var(--accent); padding: 14px 20px; border-radius: 8px; color: var(--accent); font-size: 13px; opacity: 0; transition: all 0.3s; z-index: 1000; max-width: 90%; text-align: center; }
   .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  .toast.error { border-color: var(--red); color: var(--red); }
 </style>
 </head>
 <body>
 
-<!-- Главная (Мини-апп) -->
+<!-- Главная -->
 <div id="screen-main" class="screen active">
-  <div class="header">
-    <h1>💀 СНОС</h1>
-    <p>BLACK MARKET TERMINAL</p>
-  </div>
+  <div class="header"><h1>💀 СНОС</h1><p>BLACK MARKET TERMINAL</p></div>
   <div class="balance-card">
     <div class="balance-label">БАЛАНС</div>
     <div class="balance-num" id="balance-num">0 ⭐</div>
@@ -67,8 +60,16 @@
 <div id="screen-snos" class="screen">
   <div class="header"><h1>ЦЕЛЬ</h1><p>УКАЖИТЕ @username</p></div>
   <input type="text" id="target-input" class="terminal-input" placeholder="@durov" maxlength="32">
+  
+  <div style="margin: 10px 0; font-size: 13px; color: var(--accent);">Выберите тип сноса:</div>
+  <select id="snos-type" class="terminal-input" style="appearance: none;">
+    <option value="base">сн0$ аккаунт@ (100 ⭐)</option>
+    <option value="full">полный сн0$ (150 ⭐)</option>
+    <option value="logs">полный сн0$ + л0ги (200 ⭐)</option>
+  </select>
+
   <button class="btn danger" onclick="startSnos()">💀 НАЧАТЬ</button>
-  <div id="progress" style="margin-top: 20px; font-size: 14px; white-space: pre-wrap; line-height: 1.6;"></div>
+  <div id="progress" style="margin-top: 20px; font-size: 12px; white-space: pre-wrap; line-height: 1.6;"></div>
 </div>
 
 <!-- Баланс -->
@@ -78,10 +79,9 @@
     <div class="balance-label">ТЕКУЩИЙ БАЛАНС</div>
     <div class="balance-num" id="balance-num-2">0 ⭐</div>
   </div>
-  <button class="btn" onclick="payStars(10)">10 ⭐</button>
-  <button class="btn" onclick="payStars(50)">50 ⭐</button>
   <button class="btn" onclick="payStars(100)">100 ⭐</button>
-  <button class="btn" onclick="payStars(300)">300 ⭐</button>
+  <button class="btn" onclick="payStars(200)">200 ⭐</button>
+  <button class="btn" onclick="payStars(500)">500 ⭐</button>
 </div>
 
 <!-- Прайс -->
@@ -108,7 +108,9 @@
   Telegram.WebApp.ready();
   Telegram.WebApp.expand();
 
-  const API_BASE = "https://byrat-snos.твой-воркер.workers.dev"; // ЗАМЕНИТЬ НА СВОЙ URL
+  // ЗАМЕНИ НА URL СВОЕГО ВОРКЕРА byrat-snos
+  const API_BASE = "https://byrat-snos.твой-ник.workers.dev"; 
+  
   let userId = null;
   try {
     if (Telegram.WebApp.initDataUnsafe.user) userId = Telegram.WebApp.initDataUnsafe.user.id;
@@ -138,23 +140,50 @@
 
   async function startSnos() {
     const target = document.getElementById('target-input').value.trim();
+    const type = document.getElementById('snos-type').value;
     if (!target) { showToast('Введите @username', 'error'); return; }
+
     const progress = document.getElementById('progress');
-    progress.textContent = `[!] ЦЕЛЬ ЗАХВАЧЕНА: ${target}\n[!] ЗАПУСК ПРОТОКОЛА SN#SS@KK@YNT@\n\n[░░░░░░░░░░] 0% — ИНИЦИАЛИЗАЦИЯ...`;
+    progress.textContent = `[!] ОТПРАВКА ЗАПРОСА НА СЕРВЕР...`;
 
-    const steps = [10, 30, 50, 70, 90, 100];
-    for (let i = 0; i < steps.length; i++) {
-      await new Promise(r => setTimeout(r, 1600));
-      const p = steps[i];
-      const filled = Math.floor(p / 10);
-      const bar = '█'.repeat(filled) + '░'.repeat(10 - filled);
-      const label = p === 100 ? 'ЗАВЕРШЕНО' : p === 90 ? 'УДАЛЕНИЕ СЛЕДОВ' : p === 70 ? 'СЛИВ ДАННЫХ' : p === 50 ? 'ВНЕДРЕНИЕ' : p === 30 ? 'ОБХОД ЗАЩИТЫ' : 'ПОИСК УЯЗВИМОСТЕЙ';
-      progress.textContent = `[!] ЦЕЛЬ: ${target}\n[!] ПРОТОКОЛ SN#SS@KK@YNT@\n\n[${bar}] ${p}% — ${label}...`;
+    try {
+      const res = await fetch(`${API_BASE}/api/snos?user_id=${userId}&target=${target.replace('@', '')}&type=${type}`);
+      const data = await res.json();
+
+      if (!data.ok) {
+        progress.textContent = data.message;
+        showToast(data.message, 'error');
+        return;
+      }
+      
+      // Если баланс списался, показываем анимацию
+      progress.textContent = `[!] ЦЕЛЬ ЗАХВАЧЕНА: ${target}\n\n[░░░░░░░░░░] 0% — ИНИЦИАЛИЗАЦИЯ...`;
+
+      const steps = [
+        { p: 10, t: "НАЧАЛО СЕССИИ" },
+        { p: 30, t: "ПЕРЕБОР IP 192.168.0.1" },
+        { p: 50, t: "ОТПРАВКА ЖАЛОБ С 84.23.11.5" },
+        { p: 70, t: "ПЕРЕБОР IP 104.18.2.1" },
+        { p: 90, t: "ИНИЦИАЦИЯ ПРОТОКОЛА SN#SS@KK@YNT@" },
+        { p: 100, t: "ГОТОВО" }
+      ];
+
+      for (let i = 0; i < steps.length; i++) {
+        await new Promise(r => setTimeout(r, 1600));
+        const s = steps[i];
+        const filled = Math.floor(s.p / 10);
+        const bar = '█'.repeat(filled) + '░'.repeat(10 - filled);
+        progress.textContent = `[!] ЦЕЛЬ: ${target}\n\n[${bar}] ${s.p}% — ${s.t}...`;
+      }
+
+      await new Promise(r => setTimeout(r, 500));
+      progress.textContent += `\n\n[██████████] 100% — СНОС ЗАВЕРШЕН.\n[!] ДАННЫЕ СЛИТЫ.`;
+      showToast('Снос завершен!', 'success');
+      loadBalance(); // Обновляем баланс после списания
+
+    } catch(e) {
+      showToast('Ошибка сети', 'error');
     }
-
-    await new Promise(r => setTimeout(r, 500));
-    progress.textContent += `\n\n[██████████] 100% — СНОС ЗАВЕРШЕН.\n[!] ДАННЫЕ СЛИТЫ.\n\n(Это шутка. Бот создан для развлечения.)`;
-    showToast('Снос завершен! (Шутка)', 'success');
   }
 
   function payStars(amount) {
@@ -165,7 +194,7 @@
   function showToast(text, type) {
     const t = document.getElementById('toast');
     t.textContent = text;
-    t.className = 'toast show';
+    t.className = 'toast show ' + (type || '');
     setTimeout(() => t.className = 'toast', 3000);
   }
 
