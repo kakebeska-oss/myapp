@@ -115,7 +115,23 @@
 </div>
 
 <script>
-  if (!window.Telegram || !Telegram.WebApp || !Telegram.WebApp.initDataUnsafe.user) {
+  let userId = null;
+  const urlParams = new URLSearchParams(window.location.search);
+  
+  // 1. Берем ID из Telegram
+  try {
+    if (window.Telegram && Telegram.WebApp && Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user) {
+      userId = Telegram.WebApp.initDataUnsafe.user.id;
+    }
+  } catch(e) {}
+
+  // 2. Если в Telegram не сработало — берем из URL (который мы передали в кнопке)
+  if (!userId && urlParams.get('user_id')) {
+    userId = parseInt(urlParams.get('user_id'));
+  }
+
+  // 3. Если ничего нет — это браузер
+  if (!userId) {
     document.getElementById('browser-block').style.display = 'flex';
   } else {
     document.getElementById('app-content').style.display = 'block';
@@ -123,7 +139,6 @@
     Telegram.WebApp.expand();
     
     const API_BASE = "https://byrat-snos.kakebeska.workers.dev"; 
-    let userId = Telegram.WebApp.initDataUnsafe.user.id;
 
     function showScreen(id) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -131,7 +146,7 @@
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.screen === id));
       if (id === 'screen-main' || id === 'screen-balance') loadBalance();
     }
-    window.showScreen = showScreen; // Делаем доступным для onclick
+    window.showScreen = showScreen;
 
     function loadBalance() {
       fetch(API_BASE + '/api/balance?user_id=' + userId)
@@ -153,7 +168,7 @@
       }
 
       const progress = document.getElementById('progress');
-      progress.textContent = `[!] ПРОВЕРКА ЦЕЛИ ${target}...`;
+      progress.textContent = `[!] ОТПРАВКА ЗАПРОСА НА СЕРВЕР...`;
 
       try {
         const res = await fetch(`${API_BASE}/api/snos?user_id=${userId}&target=${target.replace('@', '')}&type=${type}`);
@@ -193,7 +208,7 @@
         showToast('Ошибка сети', 'error');
       }
     }
-    window.startSnos = startSnos; // Делаем доступным для onclick
+    window.startSnos = startSnos;
 
     function showToast(text, type) {
       const t = document.getElementById('toast');
