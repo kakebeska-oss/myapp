@@ -12,8 +12,19 @@
     --red: #ff003c; --glass: rgba(0, 255, 65, 0.05); --border: rgba(0, 255, 65, 0.3);
     --text: #00ff41; --text-dim: rgba(0, 255, 65, 0.5);
   }
-  html, body { width: 100%; overflow-x: hidden; background: var(--bg); }
-  body { font-family: 'Courier New', monospace; color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+  html, body { width: 100%; overflow-x: hidden; background: var(--bg); height: 100%; }
+  body { font-family: 'Courier New', monospace; color: var(--text); display: flex; flex-direction: column; position: relative; }
+  
+  /* Экран блокировки для браузера */
+  #browser-block {
+    position: fixed; inset: 0; background: #05050f; z-index: 9999;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    text-align: center; padding: 20px;
+  }
+  #browser-block h1 { font-size: 24px; color: #ff2d2d; margin-bottom: 10px; text-shadow: 0 0 10px #ff2d2d; }
+  #browser-block p { font-size: 16px; color: #fff; opacity: 0.8; line-height: 1.5; }
+  #browser-block a { margin-top: 20px; display: inline-block; padding: 12px 24px; background: #ff2d2d; color: #fff; text-decoration: none; border-radius: 8px; font-weight: bold; }
+
   .screen { display: none; padding: 20px 16px 100px; flex: 1; flex-direction: column; }
   .screen.active { display: flex; }
   .header { text-align: center; margin-bottom: 20px; }
@@ -44,161 +55,169 @@
 </head>
 <body>
 
-<!-- Главная -->
-<div id="screen-main" class="screen active">
-  <div class="header"><h1>💀 СНОС</h1><p>BLACK MARKET TERMINAL</p></div>
-  <div class="balance-card">
-    <div class="balance-label">БАЛАНС</div>
-    <div class="balance-num" id="balance-num">0 ⭐</div>
+<!-- Блокировка для браузера -->
+<div id="browser-block" style="display: none;">
+  <h1>⚠️ ДОСТУП ЗАКРЫТ</h1>
+  <p>Этот терминал работает только внутри Telegram.<br>Откройте бота в приложении, чтобы получить доступ.</p>
+  <a href="https://t.me/ByratSn0sbot">ОТКРЫТЬ В TELEGRAM</a>
+</div>
+
+<div id="app-content" style="display: none;">
+  <!-- Главная -->
+  <div id="screen-main" class="screen active">
+    <div class="header"><h1>💀 СНОС</h1><p>BLACK MARKET TERMINAL</p></div>
+    <div class="balance-card">
+      <div class="balance-label">БАЛАНС</div>
+      <div class="balance-num" id="balance-num">0 ⭐</div>
+    </div>
+    <button class="btn danger" onclick="showScreen('screen-snos')">💀 ЗАПУСТИТЬ СНОС</button>
+    <button class="btn" onclick="showScreen('screen-balance')">💳 ПОПОЛНИТЬ</button>
+    <button class="btn" onclick="showScreen('screen-price')">📜 ПРАЙС</button>
   </div>
-  <button class="btn danger" onclick="showScreen('screen-snos')">💀 ЗАПУСТИТЬ СНОС</button>
-  <button class="btn" onclick="showScreen('screen-balance')">💳 ПОПОЛНИТЬ</button>
-  <button class="btn" onclick="showScreen('screen-price')">📜 ПРАЙС</button>
-</div>
 
-<!-- Снос -->
-<div id="screen-snos" class="screen">
-  <div class="header"><h1>ЦЕЛЬ</h1><p>УКАЖИТЕ @username</p></div>
-  <input type="text" id="target-input" class="terminal-input" placeholder="@durov" maxlength="32">
-  
-  <div style="margin: 10px 0; font-size: 13px; color: var(--accent);">Выберите тип сноса:</div>
-  <select id="snos-type" class="terminal-input" style="appearance: none;">
-    <option value="base">сн0$ аккаунт@ (100 ⭐)</option>
-    <option value="full">полный сн0$ (150 ⭐)</option>
-    <option value="logs">полный сн0$ + л0ги (200 ⭐)</option>
-  </select>
+  <!-- Снос -->
+  <div id="screen-snos" class="screen">
+    <div class="header"><h1>ЦЕЛЬ</h1><p>УКАЖИТЕ @username</p></div>
+    <input type="text" id="target-input" class="terminal-input" placeholder="@durov" maxlength="32">
+    
+    <div style="margin: 10px 0; font-size: 13px; color: var(--accent);">Выберите тип сноса:</div>
+    <select id="snos-type" class="terminal-input" style="appearance: none;">
+      <option value="base">сн0$ аккаунт@ (100 ⭐)</option>
+      <option value="full">полный сн0$ (150 ⭐)</option>
+      <option value="logs">полный сн0$ + л0ги (200 ⭐)</option>
+    </select>
 
-  <button class="btn danger" onclick="startSnos()">💀 НАЧАТЬ</button>
-  <div id="progress" style="margin-top: 20px; font-size: 12px; white-space: pre-wrap; line-height: 1.6;"></div>
-</div>
-
-<!-- Баланс -->
-<div id="screen-balance" class="screen">
-  <div class="header"><h1>ПОПОЛНЕНИЕ</h1><p>ВЫБЕРИТЕ СУММУ</p></div>
-  <div class="balance-card">
-    <div class="balance-label">ТЕКУЩИЙ БАЛАНС</div>
-    <div class="balance-num" id="balance-num-2">0 ⭐</div>
+    <button class="btn danger" onclick="startSnos()">💀 НАЧАТЬ</button>
+    <div id="progress" style="margin-top: 20px; font-size: 12px; white-space: pre-wrap; line-height: 1.6;"></div>
   </div>
-  <button class="btn" onclick="payStars(100)">100 ⭐</button>
-  <button class="btn" onclick="payStars(200)">200 ⭐</button>
-  <button class="btn" onclick="payStars(500)">500 ⭐</button>
-</div>
 
-<!-- Прайс -->
-<div id="screen-price" class="screen">
-  <div class="header"><h1>ПРАЙС</h1><p>ВСЕ СРЕДСТВА В BYRATSHOP</p></div>
-  <div style="background: var(--glass); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin: 10px 0; font-size: 14px;">
-    <p style="margin: 10px 0; color: var(--accent);">🔸 сн0$ аккаунт@ <b>100 ⭐</b></p>
-    <p style="margin: 10px 0; color: var(--accent);">🔸 полный сн0$ <b>150 ⭐</b></p>
-    <p style="margin: 10px 0; color: var(--accent);">🔸 полный сн0$ + л0ги <b>200 ⭐</b></p>
+  <!-- Баланс -->
+  <div id="screen-balance" class="screen">
+    <div class="header"><h1>ПОПОЛНЕНИЕ</h1><p>ВЫБЕРИТЕ СУММУ</p></div>
+    <div class="balance-card">
+      <div class="balance-label">ТЕКУЩИЙ БАЛАНС</div>
+      <div class="balance-num" id="balance-num-2">0 ⭐</div>
+    </div>
+    <button class="btn" onclick="payStars(100)">100 ⭐</button>
+    <button class="btn" onclick="payStars(200)">200 ⭐</button>
+    <button class="btn" onclick="payStars(500)">500 ⭐</button>
   </div>
-  <button class="btn" onclick="showScreen('screen-main')">🏠 НАЗАД</button>
-</div>
 
-<!-- Навигация -->
-<div class="nav">
-  <button class="nav-btn active" data-screen="screen-main" onclick="showScreen('screen-main')"><span class="nav-icon">💀</span>ГЛАВНАЯ</button>
-  <button class="nav-btn" data-screen="screen-snos" onclick="showScreen('screen-snos')"><span class="nav-icon">🎯</span>СНОС</button>
-  <button class="nav-btn" data-screen="screen-balance" onclick="showScreen('screen-balance')"><span class="nav-icon">💳</span>БАЛАНС</button>
-</div>
+  <!-- Прайс -->
+  <div id="screen-price" class="screen">
+    <div class="header"><h1>ПРАЙС</h1><p>ВСЕ СРЕДСТВА В BYRATSHOP</p></div>
+    <div style="background: var(--glass); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin: 10px 0; font-size: 14px;">
+      <p style="margin: 10px 0; color: var(--accent);">🔸 сн0$ аккаунт@ <b>100 ⭐</b></p>
+      <p style="margin: 10px 0; color: var(--accent);">🔸 полный сн0$ <b>150 ⭐</b></p>
+      <p style="margin: 10px 0; color: var(--accent);">🔸 полный сн0$ + л0ги <b>200 ⭐</b></p>
+    </div>
+    <button class="btn" onclick="showScreen('screen-main')">🏠 НАЗАД</button>
+  </div>
 
-<div class="toast" id="toast"></div>
+  <!-- Навигация -->
+  <div class="nav">
+    <button class="nav-btn active" data-screen="screen-main" onclick="showScreen('screen-main')"><span class="nav-icon">💀</span>ГЛАВНАЯ</button>
+    <button class="nav-btn" data-screen="screen-snos" onclick="showScreen('screen-snos')"><span class="nav-icon">🎯</span>СНОС</button>
+    <button class="nav-btn" data-screen="screen-balance" onclick="showScreen('screen-balance')"><span class="nav-icon">💳</span>БАЛАНС</button>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
 
 <script>
-  Telegram.WebApp.ready();
-  Telegram.WebApp.expand();
+  // Проверка, открыт ли в Telegram
+  if (!window.Telegram || !Telegram.WebApp || !Telegram.WebApp.initDataUnsafe.user) {
+    document.getElementById('browser-block').style.display = 'flex';
+  } else {
+    document.getElementById('app-content').style.display = 'block';
+    Telegram.WebApp.ready();
+    Telegram.WebApp.expand();
+    
+    // ЗАМЕНИ НА URL СВОЕГО ВОРКЕРА byrat-snos
+    const API_BASE = "https://byrat-snos.kakebeska.workers.dev"; 
+    let userId = Telegram.WebApp.initDataUnsafe.user.id;
 
-  // ЗАМЕНИ НА URL СВОЕГО ВОРКЕРА byrat-snos
-  const API_BASE = "https://byrat-snos.kakebeska.workers.dev/"; 
-  
-  let userId = null;
-  try {
-    if (Telegram.WebApp.initDataUnsafe.user) userId = Telegram.WebApp.initDataUnsafe.user.id;
-    else if (Telegram.WebApp.initData) {
-      const params = new URLSearchParams(Telegram.WebApp.initData);
-      const u = params.get('user');
-      if (u) userId = JSON.parse(u).id;
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.screen === id));
+      if (id === 'screen-main' || id === 'screen-balance') loadBalance();
     }
-  } catch (e) {}
 
-  function showScreen(id) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.screen === id));
-    if (id === 'screen-main' || id === 'screen-balance') loadBalance();
-  }
-
-  function loadBalance() {
-    if (!userId) return;
-    fetch(API_BASE + '/api/balance?user_id=' + userId)
-      .then(r => r.json())
-      .then(d => {
-        document.getElementById('balance-num').textContent = (d.balance || 0) + ' ⭐';
-        document.getElementById('balance-num-2').textContent = (d.balance || 0) + ' ⭐';
-      }).catch(() => {});
-  }
-
-  async function startSnos() {
-    const target = document.getElementById('target-input').value.trim();
-    const type = document.getElementById('snos-type').value;
-    if (!target) { showToast('Введите @username', 'error'); return; }
-
-    const progress = document.getElementById('progress');
-    progress.textContent = `[!] ОТПРАВКА ЗАПРОСА НА СЕРВЕР...`;
-
-    try {
-      const res = await fetch(`${API_BASE}/api/snos?user_id=${userId}&target=${target.replace('@', '')}&type=${type}`);
-      const data = await res.json();
-
-      if (!data.ok) {
-        progress.textContent = data.message;
-        showToast(data.message, 'error');
-        return;
-      }
-      
-      // Если баланс списался, показываем анимацию
-      progress.textContent = `[!] ЦЕЛЬ ЗАХВАЧЕНА: ${target}\n\n[░░░░░░░░░░] 0% — ИНИЦИАЛИЗАЦИЯ...`;
-
-      const steps = [
-        { p: 10, t: "НАЧАЛО СЕССИИ" },
-        { p: 30, t: "ПЕРЕБОР IP 192.168.0.1" },
-        { p: 50, t: "ОТПРАВКА ЖАЛОБ С 84.23.11.5" },
-        { p: 70, t: "ПЕРЕБОР IP 104.18.2.1" },
-        { p: 90, t: "ИНИЦИАЦИЯ ПРОТОКОЛА SN#SS@KK@YNT@" },
-        { p: 100, t: "ГОТОВО" }
-      ];
-
-      for (let i = 0; i < steps.length; i++) {
-        await new Promise(r => setTimeout(r, 1600));
-        const s = steps[i];
-        const filled = Math.floor(s.p / 10);
-        const bar = '█'.repeat(filled) + '░'.repeat(10 - filled);
-        progress.textContent = `[!] ЦЕЛЬ: ${target}\n\n[${bar}] ${s.p}% — ${s.t}...`;
-      }
-
-      await new Promise(r => setTimeout(r, 500));
-      progress.textContent += `\n\n[██████████] 100% — СНОС ЗАВЕРШЕН.\n[!] ДАННЫЕ СЛИТЫ.`;
-      showToast('Снос завершен!', 'success');
-      loadBalance(); // Обновляем баланс после списания
-
-    } catch(e) {
-      showToast('Ошибка сети', 'error');
+    function loadBalance() {
+      fetch(API_BASE + '/api/balance?user_id=' + userId)
+        .then(r => r.json())
+        .then(d => {
+          document.getElementById('balance-num').textContent = (d.balance || 0) + ' ⭐';
+          document.getElementById('balance-num-2').textContent = (d.balance || 0) + ' ⭐';
+        }).catch(() => {});
     }
-  }
 
-  function payStars(amount) {
-    Telegram.WebApp.sendData(JSON.stringify({ action: 'pay', amount: amount }));
-    Telegram.WebApp.close();
-  }
+    async function startSnos() {
+      const target = document.getElementById('target-input').value.trim();
+      const type = document.getElementById('snos-type').value;
+      if (!target) { showToast('Введите @username', 'error'); return; }
 
-  function showToast(text, type) {
-    const t = document.getElementById('toast');
-    t.textContent = text;
-    t.className = 'toast show ' + (type || '');
-    setTimeout(() => t.className = 'toast', 3000);
-  }
+      // Подтверждение
+      const confirmMsg = `⚠️ ВЫ УВЕРЕНЫ?\n\nЦель: ${target}\nТип: ${type}\n\nНажмите OK для запуска.`;
+      if (!confirm(confirmMsg)) return;
 
-  showScreen('screen-main');
+      const progress = document.getElementById('progress');
+      progress.textContent = `[!] ОТПРАВКА ЗАПРОСА НА СЕРВЕР...`;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/snos?user_id=${userId}&target=${target.replace('@', '')}&type=${type}`);
+        const data = await res.json();
+
+        if (!data.ok) {
+          progress.textContent = data.message;
+          showToast(data.message, 'error');
+          return;
+        }
+        
+        progress.textContent = `[!] ЦЕЛЬ ЗАХВАЧЕНА: ${target}\n\n[░░░░░░░░░░] 0% — ИНИЦИАЛИЗАЦИЯ...`;
+
+        const steps = [
+          { p: 10, t: "НАЧАЛО СЕССИИ" },
+          { p: 30, t: "ПЕРЕБОР IP 192.168.0.1" },
+          { p: 50, t: "ОТПРАВКА ЖАЛОБ С 84.23.11.5" },
+          { p: 70, t: "ПЕРЕБОР IP 104.18.2.1" },
+          { p: 90, t: "ИНИЦИАЦИЯ ПРОТОКОЛА" },
+          { p: 100, t: "ГОТОВО" }
+        ];
+
+        for (let i = 0; i < steps.length; i++) {
+          await new Promise(r => setTimeout(r, 1600));
+          const s = steps[i];
+          const filled = Math.floor(s.p / 10);
+          const bar = '█'.repeat(filled) + '░'.repeat(10 - filled);
+          progress.textContent = `[!] ЦЕЛЬ: ${target}\n\n[${bar}] ${s.p}% — ${s.t}...`;
+        }
+
+        await new Promise(r => setTimeout(r, 500));
+        progress.textContent += `\n\n[██████████] 100% — СНОС ЗАВЕРШЕН.\n[!] ДАННЫЕ СЛИТЫ.`;
+        showToast('Снос завершен!', 'success');
+        loadBalance(); 
+
+      } catch(e) {
+        showToast('Ошибка сети', 'error');
+      }
+    }
+
+    function payStars(amount) {
+      Telegram.WebApp.sendData(JSON.stringify({ action: 'pay', amount: amount }));
+      Telegram.WebApp.close();
+    }
+
+    function showToast(text, type) {
+      const t = document.getElementById('toast');
+      t.textContent = text;
+      t.className = 'toast show ' + (type || '');
+      setTimeout(() => t.className = 'toast', 3000);
+    }
+
+    showScreen('screen-main');
+  }
 </script>
 </body>
 </html>
