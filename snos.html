@@ -15,7 +15,6 @@
   html, body { width: 100%; overflow-x: hidden; background: var(--bg); height: 100%; }
   body { font-family: 'Courier New', monospace; color: var(--text); display: flex; flex-direction: column; position: relative; }
   
-  /* Экран блокировки для браузера */
   #browser-block {
     position: fixed; inset: 0; background: #05050f; z-index: 9999;
     display: flex; flex-direction: column; justify-content: center; align-items: center;
@@ -55,7 +54,6 @@
 </head>
 <body>
 
-<!-- Блокировка для браузера -->
 <div id="browser-block" style="display: none;">
   <h1>⚠️ ДОСТУП ЗАКРЫТ</h1>
   <p>Этот терминал работает только внутри Telegram.<br>Откройте бота в приложении, чтобы получить доступ.</p>
@@ -63,11 +61,10 @@
 </div>
 
 <div id="app-content" style="display: none;">
-  <!-- Главная -->
   <div id="screen-main" class="screen active">
     <div class="header"><h1>💀 СНОС</h1><p>BLACK MARKET TERMINAL</p></div>
     <div class="balance-card">
-      <div class="balance-label">БАЛАНС</div>
+      <div class="balance-label">ОБЩИЙ БАЛАНС</div>
       <div class="balance-num" id="balance-num">0 ⭐</div>
     </div>
     <button class="btn danger" onclick="showScreen('screen-snos')">💀 ЗАПУСТИТЬ СНОС</button>
@@ -75,7 +72,6 @@
     <button class="btn" onclick="showScreen('screen-price')">📜 ПРАЙС</button>
   </div>
 
-  <!-- Снос -->
   <div id="screen-snos" class="screen">
     <div class="header"><h1>ЦЕЛЬ</h1><p>УКАЖИТЕ @username</p></div>
     <input type="text" id="target-input" class="terminal-input" placeholder="@durov" maxlength="32">
@@ -91,7 +87,6 @@
     <div id="progress" style="margin-top: 20px; font-size: 12px; white-space: pre-wrap; line-height: 1.6;"></div>
   </div>
 
-  <!-- Баланс -->
   <div id="screen-balance" class="screen">
     <div class="header"><h1>ПОПОЛНЕНИЕ</h1><p>ВЫБЕРИТЕ СУММУ</p></div>
     <div class="balance-card">
@@ -103,7 +98,6 @@
     <button class="btn" onclick="payStars(500)">500 ⭐</button>
   </div>
 
-  <!-- Прайс -->
   <div id="screen-price" class="screen">
     <div class="header"><h1>ПРАЙС</h1><p>ВСЕ СРЕДСТВА В BYRATSHOP</p></div>
     <div style="background: var(--glass); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin: 10px 0; font-size: 14px;">
@@ -114,7 +108,6 @@
     <button class="btn" onclick="showScreen('screen-main')">🏠 НАЗАД</button>
   </div>
 
-  <!-- Навигация -->
   <div class="nav">
     <button class="nav-btn active" data-screen="screen-main" onclick="showScreen('screen-main')"><span class="nav-icon">💀</span>ГЛАВНАЯ</button>
     <button class="nav-btn" data-screen="screen-snos" onclick="showScreen('screen-snos')"><span class="nav-icon">🎯</span>СНОС</button>
@@ -125,7 +118,7 @@
 </div>
 
 <script>
-  // Проверка, открыт ли в Telegram
+  // Защита от браузера
   if (!window.Telegram || !Telegram.WebApp || !Telegram.WebApp.initDataUnsafe.user) {
     document.getElementById('browser-block').style.display = 'flex';
   } else {
@@ -133,7 +126,6 @@
     Telegram.WebApp.ready();
     Telegram.WebApp.expand();
     
-    // ЗАМЕНИ НА URL СВОЕГО ВОРКЕРА byrat-snos
     const API_BASE = "https://byrat-snos.kakebeska.workers.dev"; 
     let userId = Telegram.WebApp.initDataUnsafe.user.id;
 
@@ -158,7 +150,6 @@
       const type = document.getElementById('snos-type').value;
       if (!target) { showToast('Введите @username', 'error'); return; }
 
-      // Подтверждение
       const confirmMsg = `⚠️ ВЫ УВЕРЕНЫ?\n\nЦель: ${target}\nТип: ${type}\n\nНажмите OK для запуска.`;
       if (!confirm(confirmMsg)) return;
 
@@ -187,7 +178,7 @@
         ];
 
         for (let i = 0; i < steps.length; i++) {
-          await new Promise(r => setTimeout(r, 1600));
+          await new Promise(r => setTimeout(r, 1500));
           const s = steps[i];
           const filled = Math.floor(s.p / 10);
           const bar = '█'.repeat(filled) + '░'.repeat(10 - filled);
@@ -201,6 +192,7 @@
 
       } catch(e) {
         showToast('Ошибка сети', 'error');
+        progress.textContent = "Ошибка сети. Проверьте подключение.";
       }
     }
 
