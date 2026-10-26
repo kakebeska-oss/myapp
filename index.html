@@ -9,38 +9,19 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   :root {
-    --bg: #080710;
-    --bg-darker: #040409;
-    --accent-1: #9d4edd;
-    --accent-2: #ff007f;
-    --accent-3: #00f5d4;
-    --accent-blue: #00bbf9;
-    --gold: #fee440;
-    --glass: rgba(255, 255, 255, 0.04);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --glass-hover: rgba(255, 255, 255, 0.08);
-    --text: #ffffff;
-    --text-dim: rgba(255, 255, 255, 0.6);
+    --bg: #080710; --bg-darker: #040409;
+    --accent-1: #9d4edd; --accent-2: #ff007f; --accent-3: #00f5d4; --accent-blue: #00bbf9; --gold: #fee440;
+    --glass: rgba(255, 255, 255, 0.04); --glass-border: rgba(255, 255, 255, 0.1); --glass-hover: rgba(255, 255, 255, 0.08);
+    --text: #ffffff; --text-dim: rgba(255, 255, 255, 0.6);
   }
-  
   html, body { width: 100%; overflow-x: hidden; }
-  body { 
-    font-family: 'Inter', sans-serif; 
-    background: var(--bg-darker); 
-    color: var(--text); 
-    min-height: 100vh; 
-    position: relative; 
-    overflow-y: auto;
-  }
-
+  body { font-family: 'Inter', sans-serif; background: var(--bg-darker); color: var(--text); min-height: 100vh; position: relative; overflow-y: auto; }
   .bg-blobs { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
   .blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.6; animation: floatBlob 20s infinite ease-in-out alternate; }
   .blob-1 { width: 300px; height: 300px; background: var(--accent-1); top: -5%; left: -10%; animation-delay: 0s; }
   .blob-2 { width: 250px; height: 250px; background: var(--accent-2); bottom: 10%; right: -10%; animation-delay: -5s; }
   .blob-3 { width: 200px; height: 200px; background: var(--accent-3); top: 40%; left: 50%; transform: translateX(-50%); animation-delay: -10s; opacity: 0.4; }
-
   @keyframes floatBlob { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
-
   .particle { position: fixed; font-weight: 900; pointer-events: none; z-index: 1; animation: floatUp linear infinite; filter: drop-shadow(0 0 8px currentColor); }
   @keyframes floatUp { 0% { transform: translateY(0) rotate(0deg) scale(0.8); opacity: 0; } 10% { opacity: 0.8; } 90% { opacity: 0.8; } 100% { transform: translateY(-110vh) rotate(360deg) scale(1.2); opacity: 0; } }
 
@@ -52,25 +33,27 @@
   .header h1 { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 38px; background: linear-gradient(135deg, #fff 0%, var(--accent-3) 50%, var(--accent-1) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; letter-spacing: -1px; }
   .header p { font-size: 12px; color: var(--text-dim); font-weight: 700; letter-spacing: 4px; text-transform: uppercase; }
 
-  .btn { background: var(--glass); border: 1px solid var(--glass-border); color: var(--text); padding: 18px 20px; font-size: 16px; font-weight: 700; font-family: 'Inter', sans-serif; border-radius: 20px; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 14px; width: 100%; margin: 10px 0; backdrop-filter: blur(10px); transition: all 0.2s; }
+  .btn { background: var(--glass); border: 1px solid var(--glass-border); color: var(--text); padding: 18px 20px; font-size: 16px; font-weight: 700; border-radius: 20px; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 14px; width: 100%; margin: 10px 0; backdrop-filter: blur(10px); transition: all 0.2s; }
   .btn:active { transform: scale(0.97); background: var(--glass-hover); }
-  
   .btn-hero { background: linear-gradient(135deg, var(--accent-1) 0%, var(--accent-2) 100%); border: none; box-shadow: 0 15px 40px rgba(157, 78, 221, 0.4), inset 0 1px 0 rgba(255,255,255,0.2); justify-content: center; text-align: center; padding: 30px; margin: 60px 0; position: relative; overflow: hidden; }
   .btn-hero::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: 0.5s; }
   .btn-hero:active::before { left: 100%; }
   .btn-hero .btn-title { font-size: 24px; letter-spacing: 2px; font-weight: 900; }
   .btn-hero .btn-sub { font-size: 12px; color: rgba(255,255,255,0.8); font-weight: 600; margin-top: 4px; }
 
-  .categories { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; flex: 1; align-content: center; }
-  .category { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 28px; padding: 30px 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; cursor: pointer; text-align: center; min-height: 230px; backdrop-filter: blur(10px); transition: all 0.3s; }
+  .category { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 28px; padding: 24px 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; cursor: pointer; text-align: center; min-height: 160px; backdrop-filter: blur(10px); transition: all 0.3s; margin-bottom: 14px; }
   .category:active { transform: scale(0.95); background: var(--glass-hover); }
-  .category.tg { border-color: rgba(0, 245, 212, 0.3); box-shadow: inset 0 0 40px rgba(0, 245, 212, 0.05); }
-  .category.dota { border-color: rgba(255, 0, 127, 0.3); box-shadow: inset 0 0 40px rgba(255, 0, 127, 0.05); }
-  .category-icon { font-size: 60px; filter: drop-shadow(0 0 15px rgba(255,255,255,0.3)); }
-  .category.tg .category-icon { color: var(--accent-3); }
-  .category.dota .category-icon { color: var(--accent-2); }
+  .category-icon { font-size: 48px; filter: drop-shadow(0 0 15px rgba(255,255,255,0.3)); }
   .category-title { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 18px; line-height: 1.2; }
   .category-sub { font-size: 11px; color: var(--text-dim); font-weight: 700; }
+
+  .category-new { border-color: rgba(0, 245, 212, 0.4); }
+  .category-new .category-icon { color: var(--accent-3); }
+  .category-old { border-color: rgba(157, 78, 221, 0.4); }
+  .category-old .category-icon { color: var(--accent-1); }
+  .category-vip { background: linear-gradient(135deg, rgba(254, 228, 64, 0.1), rgba(255, 0, 127, 0.1)); border: 1.5px solid rgba(254, 228, 64, 0.5); box-shadow: 0 0 30px rgba(254, 228, 64, 0.2); position: relative; overflow: hidden; }
+  .category-vip .category-icon { color: var(--gold); }
+  .category-vip .category-title { background: linear-gradient(135deg, var(--gold), var(--accent-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
   .shop-item { display: flex; align-items: center; gap: 16px; padding: 16px; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 24px; margin: 12px 0; cursor: pointer; backdrop-filter: blur(10px); transition: all 0.2s; }
   .shop-item:active { transform: scale(0.97); background: var(--glass-hover); border-color: rgba(255,255,255,0.2); }
@@ -114,7 +97,7 @@
   .help-link { display: inline-block; color: #000; font-weight: 900; font-size: 18px; text-decoration: none; padding: 18px 36px; background: linear-gradient(135deg, var(--accent-3), var(--accent-blue)); border-radius: 16px; margin-top: 20px; box-shadow: 0 10px 30px rgba(0, 245, 212, 0.4); transition: 0.2s; }
   .help-link:active { transform: scale(0.95); }
 
-  .back-btn { background: transparent; border: 1px solid var(--glass-border); color: var(--text-dim); padding: 14px 24px; border-radius: 16px; font-size: 14px; font-weight: 700; font-family: 'Inter', sans-serif; cursor: pointer; margin: 30px auto 0; display: block; width: fit-content; transition: 0.2s; }
+  .back-btn { background: transparent; border: 1px solid var(--glass-border); color: var(--text-dim); padding: 14px 24px; border-radius: 16px; font-size: 14px; font-weight: 700; cursor: pointer; margin: 30px auto 0; display: block; width: fit-content; transition: 0.2s; }
   .back-btn:active { transform: scale(0.95); background: var(--glass); color: var(--text); }
 
   .nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(10, 10, 20, 0.85); border: 1px solid var(--glass-border); border-radius: 30px; padding: 10px 12px; display: flex; gap: 6px; z-index: 100; box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1); max-width: calc(100% - 24px); backdrop-filter: blur(20px); }
@@ -156,13 +139,13 @@
 <div id="screen-menu" class="screen">
   <div class="header"><h1>Меню</h1><p>Выбери раздел</p></div>
   <div style="display: flex; gap: 16px; margin-bottom: 20px;">
-    <div class="category tg" style="flex: 1; padding: 24px 12px; min-height: 180px;" onclick="showScreen('screen-shop-tg')">
-      <div class="category-icon">📱</div>
+    <div class="category" style="flex: 1; border-color: rgba(0, 245, 212, 0.3);" onclick="showScreen('screen-shop-tg')">
+      <div class="category-icon" style="color: var(--accent-3);">📱</div>
       <div class="category-title">Аккаунты TG</div>
       <div class="category-sub">Новорег / Отлега</div>
     </div>
-    <div class="category dota" style="flex: 1; padding: 24px 12px; min-height: 180px;" onclick="showScreen('screen-shop-dota')">
-      <div class="category-icon">🎮</div>
+    <div class="category" style="flex: 1; border-color: rgba(255, 0, 127, 0.3);" onclick="showScreen('screen-shop-dota')">
+      <div class="category-icon" style="color: var(--accent-2);">🎮</div>
       <div class="category-title">Сетки Dota</div>
       <div class="category-sub">CFG из фото</div>
     </div>
@@ -174,30 +157,38 @@
 <div id="screen-shop-tg" class="screen">
   <div class="header"><h1>Аккаунты TG</h1><p>Выбери тип</p></div>
 
-  <!-- Выбор между Новорег и Отлега -->
-  <div id="acc-type-choice" style="display: flex; flex-direction: column; gap: 14px;">
-    <div class="category" onclick="showAccOldMenu()" style="border-color: rgba(157, 78, 221, 0.4);">
-      <div class="category-icon" style="color: #9d4edd;">📅</div>
-      <div class="category-title">Отлега</div>
-      <div class="category-sub">6 мес, 1 год, 2 года, 3 года</div>
-    </div>
-    <div class="category" onclick="showAccList('new', 'new')" style="border-color: rgba(0, 245, 212, 0.4);">
-      <div class="category-icon" style="color: #00f5d4;">🆕</div>
+  <div id="acc-type-choice" style="display: flex; flex-direction: column; gap: 10px;">
+    <!-- Сверху Новорег -->
+    <div class="category category-new" onclick="showAccList('new', 'new')">
+      <div class="category-icon">🆕</div>
       <div class="category-title">Новорег</div>
       <div class="category-sub">Свежие аккаунты</div>
     </div>
+    
+    <!-- По центру Анонимный VIP со скидкой -->
+    <div class="category category-vip" onclick="buy('vip', 'new', 'new')">
+      <div style="position: absolute; top: 10px; right: 10px; background: var(--accent-2); color: white; font-size: 10px; font-weight: 900; padding: 4px 8px; border-radius: 8px; transform: rotate(5deg);">СКИДКА -40%</div>
+      <div class="category-icon">🏴‍☠️</div>
+      <div class="category-title">Анонимный NFT</div>
+      <div class="category-sub" style="color: var(--gold);">+888 • 1000 ⭐</div>
+    </div>
+
+    <!-- Снизу Отлега -->
+    <div class="category category-old" onclick="showAccOldMenu()">
+      <div class="category-icon">📅</div>
+      <div class="category-title">Отлега</div>
+      <div class="category-sub">6 мес, 1 год, 2 года, 3 года</div>
+    </div>
   </div>
 
-  <!-- Выбор срока отлеги -->
   <div id="acc-old-durations" style="display: none; flex-direction: column; gap: 14px;">
-    <div class="category" onclick="showAccList('old', '6m')" style="padding: 20px; min-height: auto; flex-direction: row; justify-content: center; gap: 10px;"><div class="category-title">6 месяцев</div></div>
-    <div class="category" onclick="showAccList('old', '1y')" style="padding: 20px; min-height: auto; flex-direction: row; justify-content: center; gap: 10px;"><div class="category-title">1 год</div></div>
-    <div class="category" onclick="showAccList('old', '2y')" style="padding: 20px; min-height: auto; flex-direction: row; justify-content: center; gap: 10px;"><div class="category-title">2 года</div></div>
-    <div class="category" onclick="showAccList('old', '3y')" style="padding: 20px; min-height: auto; flex-direction: row; justify-content: center; gap: 10px;"><div class="category-title">3 года</div></div>
+    <div class="category" onclick="showAccList('old', '6m')" style="padding: 20px; min-height: auto; flex-direction: row; justify-content: center;"><div class="category-title">6 месяцев</div></div>
+    <div class="category" onclick="showAccList('old', '1y')" style="padding: 20px; min-height: auto; flex-direction: row; justify-content: center;"><div class="category-title">1 год</div></div>
+    <div class="category" onclick="showAccList('old', '2y')" style="padding: 20px; min-height: auto; flex-direction: row; justify-content: center;"><div class="category-title">2 года</div></div>
+    <div class="category" onclick="showAccList('old', '3y')" style="padding: 20px; min-height: auto; flex-direction: row; justify-content: center;"><div class="category-title">3 года</div></div>
     <button class="back-btn" onclick="backToAccType()">← Назад</button>
   </div>
 
-  <!-- Список стран -->
   <div id="acc-list-container" style="display: none;">
     <div id="acc-list-title" style="text-align: center; color: var(--text-dim); font-weight: 700; margin-bottom: 15px; font-size: 14px;"></div>
     <div id="acc-list-items"></div>
@@ -281,46 +272,33 @@
   var urlParams = new URLSearchParams(window.location.search);
   var userId = urlParams.get('user_id') || (Telegram.WebApp.initDataUnsafe.user ? Telegram.WebApp.initDataUnsafe.user.id : null);
 
-  var symbols = ["⭐", "💎", "✨", "🔥"];
-  var colors = ["#fee440", "#00f5d4", "#9d4edd", "#ff007f"];
+  var symbols = ["⭐", "💎", "✨", "🔥"], colors = ["#fee440", "#00f5d4", "#9d4edd", "#ff007f"];
   for (var i = 0; i < 15; i++) {
     var p = document.createElement('div');
-    p.className = 'particle';
-    p.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+    p.className = 'particle'; p.textContent = symbols[Math.floor(Math.random() * symbols.length)];
     p.style.color = colors[Math.floor(Math.random() * colors.length)];
-    p.style.left = Math.random() * 100 + '%';
-    p.style.top = Math.random() * 100 + 'vh';
+    p.style.left = Math.random() * 100 + '%'; p.style.top = Math.random() * 100 + 'vh';
     p.style.fontSize = (10 + Math.random() * 20) + 'px';
     var dur = 12 + Math.random() * 15;
-    p.style.animationDuration = dur + 's';
-    p.style.animationDelay = '-' + (Math.random() * dur) + 's';
+    p.style.animationDuration = dur + 's'; p.style.animationDelay = '-' + (Math.random() * dur) + 's';
     p.style.opacity = 0.2 + Math.random() * 0.4;
     document.body.appendChild(p);
   }
 
   function showScreen(id) {
-    var screens = document.querySelectorAll('.screen');
-    for (var i = 0; i < screens.length; i++) screens[i].classList.remove('active');
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
-
-    var navButtons = document.querySelectorAll('.nav-btn');
-    for (var j = 0; j < navButtons.length; j++) {
-      if (navButtons[j].dataset.screen === id) navButtons[j].classList.add('active');
-      else navButtons[j].classList.remove('active');
-    }
-
-    var nav = document.getElementById('nav');
-    if (id === 'screen-main') nav.style.display = 'none';
-    else nav.style.display = 'flex';
-
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    let nb = document.querySelector(`.nav-btn[data-screen="${id}"]`);
+    if (nb) nb.classList.add('active');
+    document.getElementById('nav').style.display = (id === 'screen-main') ? 'none' : 'flex';
     if (id === 'screen-balance') loadBalance();
     if (id === 'screen-shop-tg') backToAccType();
   }
 
   function showToast(text, type) {
     var t = document.getElementById('toast');
-    t.textContent = text;
-    t.className = 'toast show ' + (type || '');
+    t.textContent = text; t.className = 'toast show ' + (type || '');
     setTimeout(function() { t.className = 'toast ' + (type || ''); }, 3500);
   }
 
@@ -328,50 +306,35 @@
     var display = document.getElementById('balance-display');
     display.innerHTML = '...<span class="balance-star">⭐</span>';
     if (!userId) { display.innerHTML = '0<span class="balance-star">⭐</span>'; return; }
-    
     var xhr = new XMLHttpRequest();
     xhr.open('GET', API_BASE + '/api/balance?user_id=' + userId, true);
     xhr.timeout = 8000;
     xhr.onload = function() {
-      try { 
-        var data = JSON.parse(xhr.responseText); 
-        display.innerHTML = data.balance + '<span class="balance-star">⭐</span>'; 
-      }
+      try { display.innerHTML = JSON.parse(xhr.responseText).balance + '<span class="balance-star">⭐</span>'; }
       catch (e) { display.innerHTML = '0<span class="balance-star">⭐</span>'; }
     };
     xhr.onerror = function() { display.innerHTML = '0<span class="balance-star">⭐</span>'; };
-    xhr.ontimeout = function() { display.innerHTML = '0<span class="balance-star">⭐</span>'; };
     xhr.send();
   }
 
   function activatePromo() {
-    var input = document.getElementById('promo-input');
-    var code = input.value.trim();
+    var input = document.getElementById('promo-input'); var code = input.value.trim();
     if (!code) { showToast('Введи промокод', 'error'); return; }
-    
     var xhr = new XMLHttpRequest();
     xhr.open('GET', API_BASE + '/api/promo?user_id=' + userId + '&code=' + encodeURIComponent(code), true);
-    xhr.timeout = 8000;
     xhr.onload = function() {
-      try { 
-        var data = JSON.parse(xhr.responseText); 
-        showToast(data.message, data.ok ? 'success' : 'error'); 
-        if (data.ok) { input.value = ''; } 
-      }
+      try { var data = JSON.parse(xhr.responseText); showToast(data.message, data.ok ? 'success' : 'error'); if (data.ok) input.value = ''; }
       catch (e) { showToast('Ошибка ответа', 'error'); }
     };
-    xhr.onerror = function() { showToast('Ошибка соединения', 'error'); };
     xhr.send();
   }
 
-  function payStars(amount) {
-    Telegram.WebApp.sendData(JSON.stringify({ action: 'pay', amount: amount }));
-    Telegram.WebApp.close();
-  }
+  function payStars(amount) { Telegram.WebApp.sendData(JSON.stringify({ action: 'pay', amount: amount })); Telegram.WebApp.close(); }
+  function buyCfg() { Telegram.WebApp.sendData(JSON.stringify({ action: 'buy', item: 'dota_cfg' })); Telegram.WebApp.close(); }
 
-  // --- ЛОГИКА ВЫБОРА АККАУНТОВ В МИНИ-АПП ---
+  // --- ЛОГИКА АККАУНТОВ ---
   const basePrices = { "usa": 100, "canada": 100, "myanmar": 120, "belarus": 170, "russia": 170, "ukraine": 170, "france": 150, "poland": 150, "pakistan": 130, "italy": 150, "vip": 1000 };
-  const names = { "usa": "США", "canada": "Канада", "myanmar": "Мьянма", "belarus": "Беларусь", "russia": "Россия", "ukraine": "Украина", "france": "Франция", "poland": "Польша", "pakistan": "Пакистан", "italy": "Италия", "vip": "Анонимный" };
+  const names = { "usa": "США", "canada": "Канада", "myanmar": "Мьянма", "belarus": "Беларусь", "russia": "Россия", "ukraine": "Украина", "france": "Франция", "poland": "Польша", "pakistan": "Пакистан", "italy": "Италия", "vip": "Анонимный NFT" };
   const flags = { "usa": "us", "canada": "ca", "myanmar": "mm", "belarus": "by", "russia": "ru", "ukraine": "ua", "france": "fr", "poland": "pl", "pakistan": "pk", "italy": "it", "vip": "" };
 
   function showAccOldMenu() {
@@ -394,9 +357,7 @@
     let title = duration === 'new' ? "Новорег (Свежие)" : "Отлега: " + (duration === '6m' ? '6 месяцев' : duration === '1y' ? '1 год' : duration === '2y' ? '2 года' : '3 года');
     document.getElementById('acc-list-title').textContent = title;
 
-    let excluded = ["vip"];
-    let addPrice = 0;
-    
+    let excluded = ["vip"], addPrice = 0;
     if (type === "old") {
       if (duration === "6m") { excluded.push("italy"); addPrice = 50; }
       if (duration === "1y") { excluded.push("italy", "myanmar"); addPrice = 100; }
@@ -410,29 +371,20 @@
         let price = basePrices[key] + (type === "old" ? addPrice : 0);
         let flagHtml = key === "vip" ? "🏴‍☠️" : `<img src="https://flagcdn.com/w80/${flags[key]}.png" alt="${key}">`;
         let vipClass = key === "vip" ? "vip" : "";
-        
         html += `
           <div class="shop-item ${vipClass}" onclick="buy('${key}', '${type}', '${duration}')">
             <div class="shop-flag">${flagHtml}</div>
             <div class="shop-info"><div class="shop-name">${names[key]}</div><div class="shop-code">${key === 'vip' ? '+888' : 'Отлега'}</div></div>
             <div class="shop-price">${price} ⭐</div>
-          </div>
-        `;
+          </div>`;
       }
     }
     document.getElementById('acc-list-items').innerHTML = html;
   }
 
-  function buy(country, type = "new", duration = "new") {
+  function buy(country, type, duration) {
     if (Telegram.WebApp) {
       Telegram.WebApp.sendData(JSON.stringify({ action: 'buy', item: country, type: type, duration: duration }));
-      Telegram.WebApp.close();
-    }
-  }
-
-  function buyCfg() {
-    if (Telegram.WebApp) {
-      Telegram.WebApp.sendData(JSON.stringify({ action: 'buy', item: 'dota_cfg' }));
       Telegram.WebApp.close();
     }
   }
