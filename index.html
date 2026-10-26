@@ -105,13 +105,27 @@
   .nav-btn .nav-icon { font-size: 22px; filter: grayscale(1) opacity(0.7); transition: 0.2s; }
   .nav-btn.active { color: #fff; background: rgba(255,255,255,0.1); }
   .nav-btn.active .nav-icon { filter: grayscale(0) opacity(1); transform: translateY(-2px); }
-  
+
   .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: rgba(10, 10, 20, 0.95); border: 1px solid var(--glass-border); padding: 18px 28px; border-radius: 20px; font-weight: 800; font-size: 15px; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); opacity: 0; z-index: 1000; pointer-events: none; max-width: 90%; text-align: center; backdrop-filter: blur(20px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
   .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
   .toast.success { border-color: rgba(0, 245, 212, 0.8); box-shadow: 0 0 20px rgba(0, 245, 212, 0.3); }
   .toast.error { border-color: rgba(255, 0, 127, 0.8); box-shadow: 0 0 20px rgba(255, 0, 127, 0.3); }
 
   .shared-balance-note { margin-top: 24px; text-align: center; font-size: 12px; color: var(--text-dim); font-weight: 700; padding: 16px 20px; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 16px; backdrop-filter: blur(10px); }
+
+  /* --- МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ --- */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px; opacity: 0; transition: opacity 0.3s; }
+  .modal-overlay.active { display: flex; opacity: 1; }
+  .modal-content { background: var(--bg); border: 1px solid var(--glass-border); border-radius: 28px; padding: 30px 24px; text-align: center; max-width: 340px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.8); transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; }
+  .modal-overlay.active .modal-content { transform: scale(1); }
+  .modal-title { font-size: 20px; font-weight: 900; margin-bottom: 10px; }
+  .modal-desc { font-size: 14px; color: var(--text-dim); margin-bottom: 24px; line-height: 1.5; }
+  .modal-price { font-size: 28px; color: var(--gold); font-weight: 900; margin: 10px 0; text-shadow: 0 0 15px rgba(254, 228, 64, 0.4); }
+  .modal-btns { display: flex; flex-direction: column; gap: 10px; }
+  .btn-confirm { background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none; padding: 18px; border-radius: 16px; font-size: 16px; font-weight: 800; cursor: pointer; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4); }
+  .btn-confirm:active { transform: scale(0.96); }
+  .btn-cancel { background: var(--glass); border: 1px solid var(--glass-border); color: var(--text-dim); padding: 18px; border-radius: 16px; font-size: 16px; font-weight: 800; cursor: pointer; }
+  .btn-cancel:active { transform: scale(0.96); background: var(--glass-hover); }
 </style>
 </head>
 <body>
@@ -120,6 +134,19 @@
   <div class="blob blob-1"></div>
   <div class="blob blob-2"></div>
   <div class="blob blob-3"></div>
+</div>
+
+<!-- МОДАЛЬНОЕ ОКНО (скрыто по умолчанию) -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal-content">
+    <div class="modal-title" id="modal-title">Подтверждение</div>
+    <div class="modal-desc" id="modal-desc">Ты уверен, что хочешь купить этот аккаунт?</div>
+    <div class="modal-price" id="modal-price">0 ⭐</div>
+    <div class="modal-btns">
+      <button class="btn-confirm" onclick="confirmBuy()">✅ Подтвердить</button>
+      <button class="btn-cancel" onclick="closeModal()">❌ Отмена</button>
+    </div>
+  </div>
 </div>
 
 <div id="screen-main" class="screen active">
@@ -153,27 +180,23 @@
   <div class="shared-balance-note">⭐ Баланс общий для аккаунтов и сеток доты</div>
 </div>
 
-<!-- ЭКРАН АККАУНТОВ TG -->
 <div id="screen-shop-tg" class="screen">
   <div class="header"><h1>Аккаунты TG</h1><p>Выбери тип</p></div>
 
   <div id="acc-type-choice" style="display: flex; flex-direction: column; gap: 10px;">
-    <!-- Сверху Новорег -->
     <div class="category category-new" onclick="showAccList('new', 'new')">
       <div class="category-icon">🆕</div>
       <div class="category-title">Новорег</div>
       <div class="category-sub">Свежие аккаунты</div>
     </div>
     
-    <!-- По центру Анонимный VIP со скидкой -->
-    <div class="category category-vip" onclick="buy('vip', 'new', 'new')">
+    <div class="category category-vip" onclick="openConfirm('vip', 'new', 'new', 'Анонимный NFT', 1000)">
       <div style="position: absolute; top: 10px; right: 10px; background: var(--accent-2); color: white; font-size: 10px; font-weight: 900; padding: 4px 8px; border-radius: 8px; transform: rotate(5deg);">СКИДКА -40%</div>
       <div class="category-icon">🏴‍☠️</div>
       <div class="category-title">Анонимный NFT</div>
       <div class="category-sub" style="color: var(--gold);">+888 • 1000 ⭐</div>
     </div>
 
-    <!-- Снизу Отлега -->
     <div class="category category-old" onclick="showAccOldMenu()">
       <div class="category-icon">📅</div>
       <div class="category-title">Отлега</div>
@@ -203,7 +226,7 @@
     <div class="dota-title">CFG-сетка из фото</div>
     <div class="dota-desc">Получи редактор, сделай уникальную сетку из своего фото и установи в Dota 2</div>
     <div class="dota-price">150 ⭐</div>
-    <button class="dota-buy" onclick="buyCfg()">ЗАКАЗАТЬ</button>
+    <button class="dota-buy" onclick="openConfirm('dota_cfg', 'new', 'new', 'CFG-сетка', 150)">ЗАКАЗАТЬ</button>
   </div>
   <button class="back-btn" onclick="showScreen('screen-menu')">← В меню</button>
 </div>
@@ -330,12 +353,33 @@
   }
 
   function payStars(amount) { Telegram.WebApp.sendData(JSON.stringify({ action: 'pay', amount: amount })); Telegram.WebApp.close(); }
-  function buyCfg() { Telegram.WebApp.sendData(JSON.stringify({ action: 'buy', item: 'dota_cfg' })); Telegram.WebApp.close(); }
 
-  // --- ЛОГИКА АККАУНТОВ ---
+  // --- ЛОГИКА АККАУНТОВ И МОДАЛЬНОГО ОКНА ---
   const basePrices = { "usa": 100, "canada": 100, "myanmar": 120, "belarus": 170, "russia": 170, "ukraine": 170, "france": 150, "poland": 150, "pakistan": 130, "italy": 150, "vip": 1000 };
-  const names = { "usa": "США", "canada": "Канада", "myanmar": "Мьянма", "belarus": "Беларусь", "russia": "Россия", "ukraine": "Украина", "france": "Франция", "poland": "Польша", "pakistan": "Пакистан", "italy": "Италия", "vip": "Анонимный NFT" };
+  const names = { "usa": "США", "canada": "Канада", "myanmar": "Мьянма", "belarus": "Беларусь", "russia": "Россия", "ukraine": "Украина", "france": "Франция", "poland": "Польша", "pakistan": "Пакистан", "italy": "Италия", "vip": "Анонимный NFT", "dota_cfg": "CFG-сетка Dota 2" };
   const flags = { "usa": "us", "canada": "ca", "myanmar": "mm", "belarus": "by", "russia": "ru", "ukraine": "ua", "france": "fr", "poland": "pl", "pakistan": "pk", "italy": "it", "vip": "" };
+
+  let currentBuyItem = null, currentBuyType = null, currentBuyDuration = null;
+
+  function openConfirm(item, type, duration, name, price) {
+    currentBuyItem = item; currentBuyType = type; currentBuyDuration = duration;
+    document.getElementById('modal-title').textContent = "Подтверждение";
+    document.getElementById('modal-desc').innerHTML = `Ты уверен, что хочешь купить <br><b>${name}</b>?`;
+    document.getElementById('modal-price').textContent = `${price} ⭐`;
+    document.getElementById('confirm-modal').classList.add('active');
+  }
+
+  function closeModal() { document.getElementById('confirm-modal').classList.remove('active'); }
+
+  function confirmBuy() {
+    closeModal();
+    if (currentBuyItem === 'dota_cfg') {
+      Telegram.WebApp.sendData(JSON.stringify({ action: 'buy', item: 'dota_cfg' }));
+    } else {
+      Telegram.WebApp.sendData(JSON.stringify({ action: 'buy', item: currentBuyItem, type: currentBuyType, duration: currentBuyDuration }));
+    }
+    Telegram.WebApp.close();
+  }
 
   function showAccOldMenu() {
     document.getElementById('acc-type-choice').style.display = 'none';
@@ -372,21 +416,14 @@
         let flagHtml = key === "vip" ? "🏴‍☠️" : `<img src="https://flagcdn.com/w80/${flags[key]}.png" alt="${key}">`;
         let vipClass = key === "vip" ? "vip" : "";
         html += `
-          <div class="shop-item ${vipClass}" onclick="buy('${key}', '${type}', '${duration}')">
+          <div class="shop-item ${vipClass}" onclick="openConfirm('${key}', '${type}', '${duration}', '${names[key]}${type === 'old' ? ' (Отлега)' : ''}', ${price})">
             <div class="shop-flag">${flagHtml}</div>
-            <div class="shop-info"><div class="shop-name">${names[key]}</div><div class="shop-code">${key === 'vip' ? '+888' : 'Отлега'}</div></div>
+            <div class="shop-info"><div class="shop-name">${names[key]}</div><div class="shop-code">${key === 'vip' ? '+888' : (type === 'old' ? 'Отлега' : 'Новорег')}</div></div>
             <div class="shop-price">${price} ⭐</div>
           </div>`;
       }
     }
     document.getElementById('acc-list-items').innerHTML = html;
-  }
-
-  function buy(country, type, duration) {
-    if (Telegram.WebApp) {
-      Telegram.WebApp.sendData(JSON.stringify({ action: 'buy', item: country, type: type, duration: duration }));
-      Telegram.WebApp.close();
-    }
   }
 
   showScreen('screen-main');
