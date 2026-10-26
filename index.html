@@ -91,4 +91,353 @@
   .dota-card { display: flex; flex-direction: column; padding: 26px; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 24px; margin: 12px 0; text-align: center; backdrop-filter: blur(10px); }
   .dota-icon { font-size: 56px; margin-bottom: 16px; filter: drop-shadow(0 0 15px rgba(255, 0, 127, 0.5)); }
   .dota-title { font-weight: 900; font-size: 20px; margin-bottom: 8px; }
-  .dota-desc { font-size: 13px; color: var(--text-dim
+  .dota-desc { font-size: 13px; color: var(--text-dim); margin-bottom: 18px; line-height: 1.5; }
+  .dota-price { font-size: 26px; color: var(--gold); font-weight: 900; margin-bottom: 20px; text-shadow: 0 0 15px rgba(254, 228, 64, 0.4); }
+  .dota-buy { width: 100%; padding: 18px; background: linear-gradient(135deg, var(--accent-1), var(--accent-2)); border: none; border-radius: 16px; color: #fff; font-size: 16px; font-weight: 900; cursor: pointer; box-shadow: 0 10px 25px rgba(255, 0, 127, 0.3); transition: 0.2s; }
+  .dota-buy:active { transform: scale(0.96); }
+
+  .balance-card { background: linear-gradient(135deg, rgba(254, 228, 64, 0.15), rgba(0, 245, 212, 0.05)); border: 1px solid rgba(254, 228, 64, 0.3); border-radius: 32px; padding: 45px 24px; text-align: center; margin: 30px 0; backdrop-filter: blur(15px); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+  .balance-label { font-size: 12px; color: var(--gold); text-transform: uppercase; letter-spacing: 5px; margin-bottom: 20px; font-weight: 800; }
+  .balance-num { font-family: 'Montserrat', sans-serif; font-size: 72px; font-weight: 900; background: linear-gradient(135deg, #fff 0%, var(--gold) 50%, #fff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; filter: drop-shadow(0 0 20px rgba(254, 228, 64, 0.4)); }
+  .balance-star { font-size: 26px; margin-left: 6px; }
+
+  .topup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  .topup-btn { background: var(--glass); border: 1px solid var(--glass-border); color: var(--text); padding: 30px 12px; border-radius: 24px; font-family: 'Inter', sans-serif; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; backdrop-filter: blur(10px); transition: 0.2s; }
+  .topup-btn:active { transform: scale(0.95); background: var(--glass-hover); border-color: rgba(0, 245, 212, 0.4); }
+  .topup-amount { font-size: 32px; font-weight: 900; font-family: 'Montserrat', sans-serif; background: linear-gradient(135deg, #fff, var(--accent-3)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .topup-star { font-size: 16px; }
+
+  .promo-input { width: 100%; padding: 24px; font-size: 22px; font-weight: 800; font-family: 'Montserrat', sans-serif; border-radius: 20px; border: 2px solid var(--glass-border); background: var(--glass); color: white; text-align: center; outline: none; margin: 20px 0; text-transform: uppercase; letter-spacing: 8px; backdrop-filter: blur(10px); transition: 0.2s; }
+  .promo-input:focus { border-color: var(--accent-1); box-shadow: 0 0 20px rgba(157, 78, 221, 0.3); }
+
+  .help-card { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 28px; padding: 40px 24px; text-align: center; margin: 24px 0; backdrop-filter: blur(10px); }
+  .help-link { display: inline-block; color: #000; font-weight: 900; font-size: 18px; text-decoration: none; padding: 18px 36px; background: linear-gradient(135deg, var(--accent-3), var(--accent-blue)); border-radius: 16px; margin-top: 20px; box-shadow: 0 10px 30px rgba(0, 245, 212, 0.4); transition: 0.2s; }
+  .help-link:active { transform: scale(0.95); }
+
+  .back-btn { background: transparent; border: 1px solid var(--glass-border); color: var(--text-dim); padding: 14px 24px; border-radius: 16px; font-size: 14px; font-weight: 700; font-family: 'Inter', sans-serif; cursor: pointer; margin: 30px auto 0; display: block; width: fit-content; transition: 0.2s; }
+  .back-btn:active { transform: scale(0.95); background: var(--glass); color: var(--text); }
+
+  .nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(10, 10, 20, 0.85); border: 1px solid var(--glass-border); border-radius: 30px; padding: 10px 12px; display: flex; gap: 6px; z-index: 100; box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1); max-width: calc(100% - 24px); backdrop-filter: blur(20px); }
+  .nav-btn { background: transparent; border: none; color: var(--text-dim); padding: 10px 14px; border-radius: 20px; font-size: 10px; font-weight: 800; font-family: 'Inter', sans-serif; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 60px; transition: 0.2s; }
+  .nav-btn .nav-icon { font-size: 22px; filter: grayscale(1) opacity(0.7); transition: 0.2s; }
+  .nav-btn.active { color: #fff; background: rgba(255,255,255,0.1); }
+  .nav-btn.active .nav-icon { filter: grayscale(0) opacity(1); transform: translateY(-2px); }
+  
+  .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: rgba(10, 10, 20, 0.95); border: 1px solid var(--glass-border); padding: 18px 28px; border-radius: 20px; font-weight: 800; font-size: 15px; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); opacity: 0; z-index: 1000; pointer-events: none; max-width: 90%; text-align: center; backdrop-filter: blur(20px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  .toast.success { border-color: rgba(0, 245, 212, 0.8); box-shadow: 0 0 20px rgba(0, 245, 212, 0.3); }
+  .toast.error { border-color: rgba(255, 0, 127, 0.8); box-shadow: 0 0 20px rgba(255, 0, 127, 0.3); }
+
+  .shared-balance-note { margin-top: 24px; text-align: center; font-size: 12px; color: var(--text-dim); font-weight: 700; padding: 16px 20px; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 16px; backdrop-filter: blur(10px); }
+</style>
+</head>
+<body>
+
+<div class="bg-blobs">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+</div>
+
+<div id="screen-main" class="screen active">
+  <div class="header" style="margin-top: 100px;">
+    <h1>Byrat Shop</h1>
+    <p>✦ Premium Store ✦</p>
+  </div>
+  <button class="btn btn-hero" onclick="showScreen('screen-menu')">
+    <div class="btn-text">
+      <span class="btn-title">НАЧАТЬ</span>
+      <span class="btn-sub">ОТКРЫТЬ МАГАЗИН</span>
+    </div>
+  </button>
+  <div class="shared-balance-note" style="margin-top: auto;">Нажми «Начать», чтобы перейти в каталог</div>
+</div>
+
+<div id="screen-menu" class="screen">
+  <div class="header"><h1>Меню</h1><p>Выбери раздел</p></div>
+  <div style="display: flex; gap: 16px; margin-bottom: 20px;">
+    <div class="category tg" style="flex: 1; padding: 24px 12px; min-height: 180px;" onclick="showScreen('screen-shop-tg')">
+      <div class="category-icon">📱</div>
+      <div class="category-title">Аккаунты TG</div>
+      <div class="category-sub">Новорег / Отлега</div>
+    </div>
+    <div class="category dota" style="flex: 1; padding: 24px 12px; min-height: 180px;" onclick="showScreen('screen-shop-dota')">
+      <div class="category-icon">🎮</div>
+      <div class="category-title">Сетки Dota</div>
+      <div class="category-sub">CFG из фото</div>
+    </div>
+  </div>
+  <div class="shared-balance-note">⭐ Баланс общий для аккаунтов и сеток доты</div>
+</div>
+
+<!-- ЭКРАН АККАУНТОВ TG -->
+<div id="screen-shop-tg" class="screen">
+  <div class="header"><h1>Аккаунты TG</h1><p>Выбери тип</p></div>
+
+  <!-- Выбор между Новорег и Отлега -->
+  <div id="acc-type-choice" style="display: flex; flex-direction: column; gap: 14px;">
+    <div class="category" onclick="showAccOldMenu()" style="border-color: rgba(157, 78, 221, 0.4);">
+      <div class="category-icon" style="color: #9d4edd;">📅</div>
+      <div class="category-title">Отлега</div>
+      <div class="category-sub">6 мес, 1 год, 2 года, 3 года</div>
+    </div>
+    <div class="category" onclick="showAccList('new', 'new')" style="border-color: rgba(0, 245, 212, 0.4);">
+      <div class="category-icon" style="color: #00f5d4;">🆕</div>
+      <div class="category-title">Новорег</div>
+      <div class="category-sub">Свежие аккаунты</div>
+    </div>
+  </div>
+
+  <!-- Выбор срока отлеги -->
+  <div id="acc-old-durations" style="display: none; flex-direction: column; gap: 14px;">
+    <div class="category" onclick="showAccList('old', '6m')" style="padding: 20px; min-height: auto; flex-direction: row; justify-content: center; gap: 10px;"><div class="category-title">6 месяцев</div></div>
+    <div class="category" onclick="showAccList('old', '1y')" style="padding: 20px; min-height: auto; flex-direction: row; justify-content: center; gap: 10px;"><div class="category-title">1 год</div></div>
+    <div class="category" onclick="showAccList('old', '2y')" style="padding: 20px; min-height: auto; flex-direction: row; justify-content: center; gap: 10px;"><div class="category-title">2 года</div></div>
+    <div class="category" onclick="showAccList('old', '3y')" style="padding: 20px; min-height: auto; flex-direction: row; justify-content: center; gap: 10px;"><div class="category-title">3 года</div></div>
+    <button class="back-btn" onclick="backToAccType()">← Назад</button>
+  </div>
+
+  <!-- Список стран -->
+  <div id="acc-list-container" style="display: none;">
+    <div id="acc-list-title" style="text-align: center; color: var(--text-dim); font-weight: 700; margin-bottom: 15px; font-size: 14px;"></div>
+    <div id="acc-list-items"></div>
+    <button class="back-btn" onclick="backToAccType()">← Назад</button>
+  </div>
+</div>
+
+<div id="screen-shop-dota" class="screen">
+  <div class="header"><h1>Сетки Dota 2</h1><p>CFG из твоего фото</p></div>
+  <div class="dota-card">
+    <div class="dota-icon">🎨</div>
+    <div class="dota-title">CFG-сетка из фото</div>
+    <div class="dota-desc">Получи редактор, сделай уникальную сетку из своего фото и установи в Dota 2</div>
+    <div class="dota-price">150 ⭐</div>
+    <button class="dota-buy" onclick="buyCfg()">ЗАКАЗАТЬ</button>
+  </div>
+  <button class="back-btn" onclick="showScreen('screen-menu')">← В меню</button>
+</div>
+
+<div id="screen-balance" class="screen">
+  <div class="header"><h1>Баланс</h1><p>Твой счёт</p></div>
+  <div class="balance-card">
+    <div class="balance-label">Доступно</div>
+    <div class="balance-num" id="balance-display">0<span class="balance-star">⭐</span></div>
+  </div>
+  <div class="shared-balance-note">⭐ Баланс общий для всех товаров</div>
+  <button class="back-btn" onclick="showScreen('screen-menu')">← В меню</button>
+</div>
+
+<div id="screen-topup" class="screen">
+  <div class="header"><h1>Пополнение</h1><p>Выбери сумму</p></div>
+  <div class="topup-grid">
+    <button class="topup-btn" onclick="payStars(10)"><span class="topup-amount">10</span><span class="topup-star">⭐</span></button>
+    <button class="topup-btn" onclick="payStars(20)"><span class="topup-amount">20</span><span class="topup-star">⭐</span></button>
+    <button class="topup-btn" onclick="payStars(50)"><span class="topup-amount">50</span><span class="topup-star">⭐</span></button>
+    <button class="topup-btn" onclick="payStars(100)"><span class="topup-amount">100</span><span class="topup-star">⭐</span></button>
+    <button class="topup-btn" onclick="payStars(150)"><span class="topup-amount">150</span><span class="topup-star">⭐</span></button>
+    <button class="topup-btn" onclick="payStars(300)"><span class="topup-amount">300</span><span class="topup-star">⭐</span></button>
+  </div>
+  <button class="btn" onclick="showScreen('screen-promo')" style="justify-content: center; background: rgba(254, 228, 64, 0.15); border-color: rgba(254, 228, 64, 0.4); margin-top: 10px;">
+    <div class="btn-text" style="align-items: center;"><span class="btn-title" style="color: var(--gold);">🎁 Ввести промокод</span></div>
+  </button>
+  <button class="back-btn" onclick="showScreen('screen-menu')">← В меню</button>
+</div>
+
+<div id="screen-promo" class="screen">
+  <div class="header"><h1>Промокод</h1><p>Активируй бонус</p></div>
+  <input type="text" id="promo-input" class="promo-input" placeholder="КОД" maxlength="20">
+  <button class="btn" onclick="activatePromo()" style="justify-content: center; background: linear-gradient(135deg, var(--accent-1), var(--accent-2)); border: none; box-shadow: 0 10px 25px rgba(255, 0, 127, 0.3);">
+    <div class="btn-text" style="align-items: center;"><span class="btn-title">✅ АКТИВИРОВАТЬ</span></div>
+  </button>
+  <button class="back-btn" onclick="showScreen('screen-topup')">← Назад к пополнению</button>
+</div>
+
+<div id="screen-help" class="screen">
+  <div class="header"><h1>Помощь</h1><p>Связаться с нами</p></div>
+  <div class="help-card">
+    <div style="font-size: 60px; margin-bottom: 20px; filter: drop-shadow(0 0 20px rgba(0,245,212,0.5));">💬</div>
+    <div style="font-size: 14px; color: var(--text-dim); margin-bottom: 8px; font-weight: 600;">По всем вопросам пишите</div>
+    <a href="https://t.me/ownerByrat_Shop" target="_blank" class="help-link">@ownerByrat_Shop</a>
+  </div>
+  <button class="back-btn" onclick="showScreen('screen-menu')">← В меню</button>
+</div>
+
+<div class="nav" id="nav" style="display: none;">
+  <button class="nav-btn" data-screen="screen-menu" onclick="showScreen('screen-menu')"><span class="nav-icon">🏠</span><span>Меню</span></button>
+  <button class="nav-btn" data-screen="screen-shop-tg" onclick="showScreen('screen-shop-tg')"><span class="nav-icon">📱</span><span>TG</span></button>
+  <button class="nav-btn" data-screen="screen-shop-dota" onclick="showScreen('screen-shop-dota')"><span class="nav-icon">🎮</span><span>Dota</span></button>
+  <button class="nav-btn" data-screen="screen-balance" onclick="showScreen('screen-balance')"><span class="nav-icon">💰</span><span>Баланс</span></button>
+  <button class="nav-btn" data-screen="screen-topup" onclick="showScreen('screen-topup')"><span class="nav-icon">➕</span><span>Пополнить</span></button>
+  <button class="nav-btn" data-screen="screen-help" onclick="showScreen('screen-help')"><span class="nav-icon">❓</span><span>Помощь</span></button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  Telegram.WebApp.ready();
+  Telegram.WebApp.expand();
+
+  var API_BASE = "https://my-telegram-bot.kakebeska.workers.dev";
+  var urlParams = new URLSearchParams(window.location.search);
+  var userId = urlParams.get('user_id') || (Telegram.WebApp.initDataUnsafe.user ? Telegram.WebApp.initDataUnsafe.user.id : null);
+
+  var symbols = ["⭐", "💎", "✨", "🔥"];
+  var colors = ["#fee440", "#00f5d4", "#9d4edd", "#ff007f"];
+  for (var i = 0; i < 15; i++) {
+    var p = document.createElement('div');
+    p.className = 'particle';
+    p.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+    p.style.color = colors[Math.floor(Math.random() * colors.length)];
+    p.style.left = Math.random() * 100 + '%';
+    p.style.top = Math.random() * 100 + 'vh';
+    p.style.fontSize = (10 + Math.random() * 20) + 'px';
+    var dur = 12 + Math.random() * 15;
+    p.style.animationDuration = dur + 's';
+    p.style.animationDelay = '-' + (Math.random() * dur) + 's';
+    p.style.opacity = 0.2 + Math.random() * 0.4;
+    document.body.appendChild(p);
+  }
+
+  function showScreen(id) {
+    var screens = document.querySelectorAll('.screen');
+    for (var i = 0; i < screens.length; i++) screens[i].classList.remove('active');
+    document.getElementById(id).classList.add('active');
+
+    var navButtons = document.querySelectorAll('.nav-btn');
+    for (var j = 0; j < navButtons.length; j++) {
+      if (navButtons[j].dataset.screen === id) navButtons[j].classList.add('active');
+      else navButtons[j].classList.remove('active');
+    }
+
+    var nav = document.getElementById('nav');
+    if (id === 'screen-main') nav.style.display = 'none';
+    else nav.style.display = 'flex';
+
+    if (id === 'screen-balance') loadBalance();
+    if (id === 'screen-shop-tg') backToAccType();
+  }
+
+  function showToast(text, type) {
+    var t = document.getElementById('toast');
+    t.textContent = text;
+    t.className = 'toast show ' + (type || '');
+    setTimeout(function() { t.className = 'toast ' + (type || ''); }, 3500);
+  }
+
+  function loadBalance() {
+    var display = document.getElementById('balance-display');
+    display.innerHTML = '...<span class="balance-star">⭐</span>';
+    if (!userId) { display.innerHTML = '0<span class="balance-star">⭐</span>'; return; }
+    
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', API_BASE + '/api/balance?user_id=' + userId, true);
+    xhr.timeout = 8000;
+    xhr.onload = function() {
+      try { 
+        var data = JSON.parse(xhr.responseText); 
+        display.innerHTML = data.balance + '<span class="balance-star">⭐</span>'; 
+      }
+      catch (e) { display.innerHTML = '0<span class="balance-star">⭐</span>'; }
+    };
+    xhr.onerror = function() { display.innerHTML = '0<span class="balance-star">⭐</span>'; };
+    xhr.ontimeout = function() { display.innerHTML = '0<span class="balance-star">⭐</span>'; };
+    xhr.send();
+  }
+
+  function activatePromo() {
+    var input = document.getElementById('promo-input');
+    var code = input.value.trim();
+    if (!code) { showToast('Введи промокод', 'error'); return; }
+    
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', API_BASE + '/api/promo?user_id=' + userId + '&code=' + encodeURIComponent(code), true);
+    xhr.timeout = 8000;
+    xhr.onload = function() {
+      try { 
+        var data = JSON.parse(xhr.responseText); 
+        showToast(data.message, data.ok ? 'success' : 'error'); 
+        if (data.ok) { input.value = ''; } 
+      }
+      catch (e) { showToast('Ошибка ответа', 'error'); }
+    };
+    xhr.onerror = function() { showToast('Ошибка соединения', 'error'); };
+    xhr.send();
+  }
+
+  function payStars(amount) {
+    Telegram.WebApp.sendData(JSON.stringify({ action: 'pay', amount: amount }));
+    Telegram.WebApp.close();
+  }
+
+  // --- ЛОГИКА ВЫБОРА АККАУНТОВ В МИНИ-АПП ---
+  const basePrices = { "usa": 100, "canada": 100, "myanmar": 120, "belarus": 170, "russia": 170, "ukraine": 170, "france": 150, "poland": 150, "pakistan": 130, "italy": 150, "vip": 1000 };
+  const names = { "usa": "США", "canada": "Канада", "myanmar": "Мьянма", "belarus": "Беларусь", "russia": "Россия", "ukraine": "Украина", "france": "Франция", "poland": "Польша", "pakistan": "Пакистан", "italy": "Италия", "vip": "Анонимный" };
+  const flags = { "usa": "us", "canada": "ca", "myanmar": "mm", "belarus": "by", "russia": "ru", "ukraine": "ua", "france": "fr", "poland": "pl", "pakistan": "pk", "italy": "it", "vip": "" };
+
+  function showAccOldMenu() {
+    document.getElementById('acc-type-choice').style.display = 'none';
+    document.getElementById('acc-old-durations').style.display = 'flex';
+    document.getElementById('acc-list-container').style.display = 'none';
+  }
+
+  function backToAccType() {
+    document.getElementById('acc-type-choice').style.display = 'flex';
+    document.getElementById('acc-old-durations').style.display = 'none';
+    document.getElementById('acc-list-container').style.display = 'none';
+  }
+
+  function showAccList(type, duration) {
+    document.getElementById('acc-type-choice').style.display = 'none';
+    document.getElementById('acc-old-durations').style.display = 'none';
+    document.getElementById('acc-list-container').style.display = 'block';
+
+    let title = duration === 'new' ? "Новорег (Свежие)" : "Отлега: " + (duration === '6m' ? '6 месяцев' : duration === '1y' ? '1 год' : duration === '2y' ? '2 года' : '3 года');
+    document.getElementById('acc-list-title').textContent = title;
+
+    let excluded = ["vip"];
+    let addPrice = 0;
+    
+    if (type === "old") {
+      if (duration === "6m") { excluded.push("italy"); addPrice = 50; }
+      if (duration === "1y") { excluded.push("italy", "myanmar"); addPrice = 100; }
+      if (duration === "2y") { excluded.push("italy", "myanmar", "canada"); addPrice = 150; }
+      if (duration === "3y") { excluded.push("italy", "myanmar", "canada", "france", "poland", "pakistan"); addPrice = 300; }
+    }
+
+    let html = "";
+    for (let key in basePrices) {
+      if (!excluded.includes(key)) {
+        let price = basePrices[key] + (type === "old" ? addPrice : 0);
+        let flagHtml = key === "vip" ? "🏴‍☠️" : `<img src="https://flagcdn.com/w80/${flags[key]}.png" alt="${key}">`;
+        let vipClass = key === "vip" ? "vip" : "";
+        
+        html += `
+          <div class="shop-item ${vipClass}" onclick="buy('${key}', '${type}', '${duration}')">
+            <div class="shop-flag">${flagHtml}</div>
+            <div class="shop-info"><div class="shop-name">${names[key]}</div><div class="shop-code">${key === 'vip' ? '+888' : 'Отлега'}</div></div>
+            <div class="shop-price">${price} ⭐</div>
+          </div>
+        `;
+      }
+    }
+    document.getElementById('acc-list-items').innerHTML = html;
+  }
+
+  function buy(country, type = "new", duration = "new") {
+    if (Telegram.WebApp) {
+      Telegram.WebApp.sendData(JSON.stringify({ action: 'buy', item: country, type: type, duration: duration }));
+      Telegram.WebApp.close();
+    }
+  }
+
+  function buyCfg() {
+    if (Telegram.WebApp) {
+      Telegram.WebApp.sendData(JSON.stringify({ action: 'buy', item: 'dota_cfg' }));
+      Telegram.WebApp.close();
+    }
+  }
+
+  showScreen('screen-main');
+</script>
+</body>
+</html>
