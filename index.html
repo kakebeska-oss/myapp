@@ -9,133 +9,253 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   :root {
-    --bg: #05050f;
-    --accent: #8b5cf6;
-    --accent-hot: #d946ef;
-    --accent-cyan: #22d3ee;
-    --gold: #fbbf24;
-    --glass: rgba(255, 255, 255, 0.05);
-    --glass-border: rgba(255, 255, 255, 0.12);
+    --bg: #080710;
+    --bg-darker: #040409;
+    --accent-1: #9d4edd;
+    --accent-2: #ff007f;
+    --accent-3: #00f5d4;
+    --accent-blue: #00bbf9;
+    --gold: #fee440;
+    --glass: rgba(255, 255, 255, 0.04);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-hover: rgba(255, 255, 255, 0.08);
     --text: #ffffff;
-    --text-dim: rgba(255, 255, 255, 0.55);
+    --text-dim: rgba(255, 255, 255, 0.6);
   }
+  
   html, body { width: 100%; overflow-x: hidden; }
-  body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; position: relative; }
-  body::before { content: ""; position: fixed; inset: 0; background: radial-gradient(circle at 20% 20%, rgba(139,92,246,0.4), transparent 40%), radial-gradient(circle at 80% 30%, rgba(217,70,239,0.3), transparent 40%), radial-gradient(circle at 50% 80%, rgba(34,211,238,0.25), transparent 45%); pointer-events: none; z-index: 0; }
-  .particle { position: fixed; font-weight: 900; pointer-events: none; z-index: 1; animation: floatUp linear infinite; }
-  @keyframes floatUp { 0% { transform: translateY(0) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 0.85; } 100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; } }
-  .screen { display: none; padding: 24px 20px 130px; min-height: 100vh; position: relative; z-index: 2; flex-direction: column; }
-  .screen.active { display: flex; animation: screenIn 0.3s ease; }
-  @keyframes screenIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-  .header { text-align: center; margin-bottom: 28px; margin-top: 12px; }
-  .header h1 { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 36px; background: linear-gradient(135deg, #fff 0%, #d946ef 40%, #8b5cf6 70%, #22d3ee 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
-  .header p { font-size: 12px; color: var(--text-dim); font-weight: 700; letter-spacing: 3px; text-transform: uppercase; }
-  .btn { background: var(--glass); border: 1px solid var(--glass-border); color: var(--text); padding: 16px 20px; font-size: 16px; font-weight: 700; font-family: 'Inter', sans-serif; border-radius: 20px; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 14px; width: 100%; margin: 7px 0; }
-  .btn:active { transform: scale(0.97); }
-  .btn-hero { background: linear-gradient(135deg, #8b5cf6 0%, #d946ef 50%, #8b5cf6 100%); border: none; box-shadow: 0 25px 60px rgba(139,92,246,0.6); justify-content: center; text-align: center; padding: 28px; margin: 50px 0; }
-  .btn-hero .btn-text { align-items: center; }
-  .btn-hero .btn-title { font-size: 22px; letter-spacing: 2px; }
-  .btn-text { display: flex; flex-direction: column; gap: 2px; }
-  .btn-title { font-weight: 800; font-size: 16px; }
-  .btn-sub { font-size: 11px; color: var(--text-dim); font-weight: 600; }
+  body { 
+    font-family: 'Inter', sans-serif; 
+    background: var(--bg-darker); 
+    color: var(--text); 
+    min-height: 100vh; 
+    position: relative; 
+    overflow-y: auto;
+  }
 
-  .categories { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 40px; flex: 1; align-content: center; }
-  .category { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 24px; padding: 28px 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; cursor: pointer; text-align: center; min-height: 220px; }
-  .category:active { transform: scale(0.96); }
-  .category.tg { border-color: rgba(34,211,238,0.3); }
-  .category.dota { border-color: rgba(239,68,68,0.3); }
-  .category-icon { font-size: 56px; }
-  .category.tg .category-icon { color: var(--accent-cyan); }
-  .category.dota .category-icon { color: #ef4444; }
-  .category-title { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 17px; line-height: 1.2; }
-  .category-sub { font-size: 11px; color: var(--text-dim); font-weight: 600; }
+  /* Фоновые пятна (Aurora effect) */
+  .bg-blobs {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.6;
+    animation: floatBlob 20s infinite ease-in-out alternate;
+  }
+  .blob-1 { width: 300px; height: 300px; background: var(--accent-1); top: -5%; left: -10%; animation-delay: 0s; }
+  .blob-2 { width: 250px; height: 250px; background: var(--accent-2); bottom: 10%; right: -10%; animation-delay: -5s; }
+  .blob-3 { width: 200px; height: 200px; background: var(--accent-3); top: 40%; left: 50%; transform: translateX(-50%); animation-delay: -10s; opacity: 0.4; }
 
-  .shared-balance-note { margin-top: 30px; text-align: center; font-size: 12px; color: var(--text-dim); font-weight: 700; padding: 14px 18px; background: rgba(139,92,246,0.08); border: 1px solid rgba(139,92,246,0.25); border-radius: 14px; }
+  @keyframes floatBlob {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(30px, 50px) scale(1.1); }
+  }
 
-  .balance-card { background: linear-gradient(135deg, rgba(251,191,36,0.18), rgba(251,191,36,0.03)); border: 1px solid rgba(251,191,36,0.4); border-radius: 28px; padding: 40px 24px; text-align: center; margin: 24px 0; }
-  .balance-label { font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 4px; margin-bottom: 16px; font-weight: 700; }
-  .balance-num { font-family: 'Montserrat', sans-serif; font-size: 68px; font-weight: 900; background: linear-gradient(135deg, #fff 0%, #fbbf24 50%, #fff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; }
-  .balance-star { font-size: 24px; margin-left: 6px; }
+  .particle { position: fixed; font-weight: 900; pointer-events: none; z-index: 1; animation: floatUp linear infinite; filter: drop-shadow(0 0 8px currentColor); }
+  @keyframes floatUp { 
+    0% { transform: translateY(0) rotate(0deg) scale(0.8); opacity: 0; } 
+    10% { opacity: 0.8; } 
+    90% { opacity: 0.8; } 
+    100% { transform: translateY(-110vh) rotate(360deg) scale(1.2); opacity: 0; } 
+  }
 
-  .shop-item { display: flex; align-items: center; gap: 14px; padding: 16px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 20px; margin: 10px 0; cursor: pointer; }
-  .shop-item:active { transform: scale(0.98); background: rgba(255,255,255,0.08); }
+  /* Экраны */
+  .screen { display: none; padding: 30px 20px 120px; min-height: 100vh; position: relative; z-index: 2; flex-direction: column; }
+  .screen.active { display: flex; animation: screenSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+  @keyframes screenSlideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Шапка */
+  .header { text-align: center; margin-bottom: 30px; margin-top: 10px; }
+  .header h1 { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 38px; background: linear-gradient(135deg, #fff 0%, var(--accent-3) 50%, var(--accent-1) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; letter-spacing: -1px; }
+  .header p { font-size: 12px; color: var(--text-dim); font-weight: 700; letter-spacing: 4px; text-transform: uppercase; }
+
+  /* Кнопки */
+  .btn { background: var(--glass); border: 1px solid var(--glass-border); color: var(--text); padding: 18px 20px; font-size: 16px; font-weight: 700; font-family: 'Inter', sans-serif; border-radius: 20px; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 14px; width: 100%; margin: 10px 0; backdrop-filter: blur(10px); transition: all 0.2s; }
+  .btn:active { transform: scale(0.97); background: var(--glass-hover); }
+  
+  .btn-hero { 
+    background: linear-gradient(135deg, var(--accent-1) 0%, var(--accent-2) 100%); 
+    border: none; 
+    box-shadow: 0 15px 40px rgba(157, 78, 221, 0.4), inset 0 1px 0 rgba(255,255,255,0.2); 
+    justify-content: center; 
+    text-align: center; 
+    padding: 30px; 
+    margin: 60px 0; 
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-hero::before {
+    content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: 0.5s;
+  }
+  .btn-hero:active::before { left: 100%; }
+  .btn-hero .btn-title { font-size: 24px; letter-spacing: 2px; font-weight: 900; }
+  .btn-hero .btn-sub { font-size: 12px; color: rgba(255,255,255,0.8); font-weight: 600; margin-top: 4px; }
+
+  /* Сетка на главной */
+  .categories { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; flex: 1; align-content: center; }
+  .category { 
+    background: var(--glass); border: 1px solid var(--glass-border); border-radius: 28px; padding: 30px 16px; 
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; 
+    cursor: pointer; text-align: center; min-height: 230px; backdrop-filter: blur(10px); transition: all 0.3s;
+  }
+  .category:active { transform: scale(0.95); background: var(--glass-hover); }
+  .category.tg { border-color: rgba(0, 245, 212, 0.3); box-shadow: inset 0 0 40px rgba(0, 245, 212, 0.05); }
+  .category.dota { border-color: rgba(255, 0, 127, 0.3); box-shadow: inset 0 0 40px rgba(255, 0, 127, 0.05); }
+  .category-icon { font-size: 60px; filter: drop-shadow(0 0 15px rgba(255,255,255,0.3)); }
+  .category.tg .category-icon { color: var(--accent-3); }
+  .category.dota .category-icon { color: var(--accent-2); }
+  .category-title { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 18px; line-height: 1.2; }
+  .category-sub { font-size: 11px; color: var(--text-dim); font-weight: 700; }
+
+  /* Карточки товаров */
+  .shop-item { 
+    display: flex; align-items: center; gap: 16px; padding: 16px; background: var(--glass); 
+    border: 1px solid var(--glass-border); border-radius: 24px; margin: 12px 0; 
+    cursor: pointer; backdrop-filter: blur(10px); transition: all 0.2s; 
+  }
+  .shop-item:active { transform: scale(0.97); background: var(--glass-hover); border-color: rgba(255,255,255,0.2); }
   .shop-flag { width: 60px; height: 60px; border-radius: 16px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); font-size: 34px; overflow: hidden; }
   .shop-flag img { width: 100%; height: 100%; object-fit: cover; border-radius: 16px; }
   .shop-info { flex: 1; }
   .shop-name { font-weight: 800; font-size: 17px; margin-bottom: 4px; }
   .shop-code { font-size: 12px; color: var(--text-dim); font-weight: 600; }
-  .shop-price { font-size: 16px; color: var(--gold); font-weight: 900; white-space: nowrap; }
+  .shop-price { font-size: 17px; color: var(--gold); font-weight: 900; white-space: nowrap; text-shadow: 0 0 10px rgba(254, 228, 64, 0.4); }
 
-  .shop-item.vip { background: linear-gradient(135deg, rgba(251,191,36,0.2), rgba(139,92,246,0.2)); border: 2px solid rgba(251,191,36,0.6); padding: 20px 16px; box-shadow: 0 0 25px rgba(251,191,36,0.4); position: relative; }
-  .shop-item.vip::after { content: "🏴‍☠️"; position: absolute; top: 8px; right: 12px; font-size: 18px; }
-  .shop-item.vip .shop-flag { background: linear-gradient(135deg, rgba(251,191,36,0.3), rgba(217,70,239,0.3)); border: 1px solid rgba(251,191,36,0.5); font-size: 36px; }
-  .shop-item.vip .shop-name { background: linear-gradient(135deg, #fbbf24, #d946ef, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 18px; }
+  /* VIP */
+  .shop-item.vip { background: linear-gradient(135deg, rgba(254, 228, 64, 0.1), rgba(255, 0, 127, 0.1)); border: 1.5px solid rgba(254, 228, 64, 0.5); padding: 22px 16px; box-shadow: 0 0 30px rgba(254, 228, 64, 0.2); position: relative; overflow: hidden; }
+  .shop-item.vip::after { content: "👑"; position: absolute; top: 8px; right: 12px; font-size: 18px; opacity: 0.8; }
+  .shop-item.vip .shop-flag { background: linear-gradient(135deg, rgba(254, 228, 64, 0.2), rgba(255, 0, 127, 0.2)); border: 1px solid rgba(254, 228, 64, 0.4); font-size: 36px; }
+  .shop-item.vip .shop-name { background: linear-gradient(135deg, var(--gold), var(--accent-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 19px; }
   .shop-item.vip .shop-code { color: var(--gold); font-weight: 700; }
-  .shop-item.vip .shop-price { background: linear-gradient(135deg, #fbbf24, #d946ef, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 20px; font-weight: 900; }
+  .shop-item.vip .shop-price { background: linear-gradient(135deg, var(--gold), var(--accent-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 22px; font-weight: 900; text-shadow: none; }
 
-  .dota-card { display: flex; flex-direction: column; padding: 22px; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 22px; margin: 12px 0; text-align: center; }
-  .dota-icon { font-size: 48px; margin-bottom: 12px; }
-  .dota-title { font-weight: 800; font-size: 18px; margin-bottom: 6px; }
-  .dota-desc { font-size: 13px; color: var(--text-dim); margin-bottom: 14px; line-height: 1.5; }
-  .dota-price { font-size: 22px; color: var(--gold); font-weight: 900; margin-bottom: 16px; }
-  .dota-buy { width: 100%; padding: 16px; background: linear-gradient(135deg, #10b981, #059669); border: none; border-radius: 14px; color: #fff; font-size: 15px; font-weight: 800; cursor: pointer; }
+  /* Дота */
+  .dota-card { display: flex; flex-direction: column; padding: 26px; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 24px; margin: 12px 0; text-align: center; backdrop-filter: blur(10px); }
+  .dota-icon { font-size: 56px; margin-bottom: 16px; filter: drop-shadow(0 0 15px rgba(255, 0, 127, 0.5)); }
+  .dota-title { font-weight: 900; font-size: 20px; margin-bottom: 8px; }
+  .dota-desc { font-size: 13px; color: var(--text-dim); margin-bottom: 18px; line-height: 1.5; }
+  .dota-price { font-size: 26px; color: var(--gold); font-weight: 900; margin-bottom: 20px; text-shadow: 0 0 15px rgba(254, 228, 64, 0.4); }
+  .dota-buy { width: 100%; padding: 18px; background: linear-gradient(135deg, var(--accent-1), var(--accent-2)); border: none; border-radius: 16px; color: #fff; font-size: 16px; font-weight: 900; cursor: pointer; box-shadow: 0 10px 25px rgba(255, 0, 127, 0.3); transition: 0.2s; }
+  .dota-buy:active { transform: scale(0.96); }
 
-  .topup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 24px 0; }
-  .topup-btn { background: var(--glass); border: 1px solid var(--glass-border); color: var(--text); padding: 26px 12px; border-radius: 22px; font-family: 'Inter', sans-serif; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px; }
-  .topup-btn:active { transform: scale(0.95); }
-  .topup-amount { font-size: 28px; font-weight: 900; font-family: 'Montserrat', sans-serif; background: linear-gradient(135deg, #fff, #d946ef); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  /* Баланс */
+  .balance-card { background: linear-gradient(135deg, rgba(254, 228, 64, 0.15), rgba(0, 245, 212, 0.05)); border: 1px solid rgba(254, 228, 64, 0.3); border-radius: 32px; padding: 45px 24px; text-align: center; margin: 30px 0; backdrop-filter: blur(15px); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+  .balance-label { font-size: 12px; color: var(--gold); text-transform: uppercase; letter-spacing: 5px; margin-bottom: 20px; font-weight: 800; }
+  .balance-num { font-family: 'Montserrat', sans-serif; font-size: 72px; font-weight: 900; background: linear-gradient(135deg, #fff 0%, var(--gold) 50%, #fff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; filter: drop-shadow(0 0 20px rgba(254, 228, 64, 0.4)); }
+  .balance-star { font-size: 26px; margin-left: 6px; }
+
+  /* Пополнение */
+  .topup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  .topup-btn { background: var(--glass); border: 1px solid var(--glass-border); color: var(--text); padding: 30px 12px; border-radius: 24px; font-family: 'Inter', sans-serif; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; backdrop-filter: blur(10px); transition: 0.2s; }
+  .topup-btn:active { transform: scale(0.95); background: var(--glass-hover); border-color: rgba(0, 245, 212, 0.4); }
+  .topup-amount { font-size: 32px; font-weight: 900; font-family: 'Montserrat', sans-serif; background: linear-gradient(135deg, #fff, var(--accent-3)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   .topup-star { font-size: 16px; }
 
-  .promo-input { width: 100%; padding: 22px; font-size: 20px; font-weight: 800; font-family: 'Montserrat', sans-serif; border-radius: 20px; border: 2px solid var(--glass-border); background: var(--glass); color: white; text-align: center; outline: none; margin: 24px 0; text-transform: uppercase; letter-spacing: 6px; }
+  /* Промокод */
+  .promo-input { width: 100%; padding: 24px; font-size: 22px; font-weight: 800; font-family: 'Montserrat', sans-serif; border-radius: 20px; border: 2px solid var(--glass-border); background: var(--glass); color: white; text-align: center; outline: none; margin: 20px 0; text-transform: uppercase; letter-spacing: 8px; backdrop-filter: blur(10px); transition: 0.2s; }
+  .promo-input:focus { border-color: var(--accent-1); box-shadow: 0 0 20px rgba(157, 78, 221, 0.3); }
 
-  .help-card { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 24px; padding: 32px 24px; text-align: center; margin: 20px 0; }
-  .help-link { display: inline-block; color: #fff; font-weight: 800; font-size: 18px; text-decoration: none; padding: 16px 32px; background: linear-gradient(135deg, #22d3ee, #0891b2); border-radius: 16px; margin-top: 16px; box-shadow: 0 10px 30px rgba(34,211,238,0.5); }
+  /* Помощь */
+  .help-card { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 28px; padding: 40px 24px; text-align: center; margin: 24px 0; backdrop-filter: blur(10px); }
+  .help-link { display: inline-block; color: #000; font-weight: 900; font-size: 18px; text-decoration: none; padding: 18px 36px; background: linear-gradient(135deg, var(--accent-3), var(--accent-blue)); border-radius: 16px; margin-top: 20px; box-shadow: 0 10px 30px rgba(0, 245, 212, 0.4); transition: 0.2s; }
+  .help-link:active { transform: scale(0.95); }
 
-  .back-btn { background: var(--glass); border: 1px solid var(--glass-border); color: var(--text-dim); padding: 14px 24px; border-radius: 16px; font-size: 14px; font-weight: 700; font-family: 'Inter', sans-serif; cursor: pointer; margin: 20px auto 0; display: block; width: fit-content; }
-  .back-btn:active { transform: scale(0.95); }
+  /* Кнопка Назад */
+  .back-btn { background: transparent; border: 1px solid var(--glass-border); color: var(--text-dim); padding: 14px 24px; border-radius: 16px; font-size: 14px; font-weight: 700; font-family: 'Inter', sans-serif; cursor: pointer; margin: 30px auto 0; display: block; width: fit-content; transition: 0.2s; }
+  .back-btn:active { transform: scale(0.95); background: var(--glass); color: var(--text); }
 
-  .nav { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); background: rgba(10,10,25,0.9); border: 1px solid var(--glass-border); border-radius: 26px; padding: 10px; display: flex; gap: 4px; z-index: 100; box-shadow: 0 20px 60px rgba(0,0,0,0.7); max-width: calc(100% - 32px); }
-  .nav-btn { background: transparent; border: none; color: var(--text-dim); padding: 10px 14px; border-radius: 16px; font-size: 10px; font-weight: 700; font-family: 'Inter', sans-serif; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 62px; }
-  .nav-btn .nav-icon { font-size: 22px; }
-  .nav-btn.active { color: #fff; background: linear-gradient(135deg, rgba(139,92,246,0.4), rgba(217,70,239,0.3)); box-shadow: 0 8px 25px rgba(139,92,246,0.5); }
-
-  .toast { position: fixed; top: 24px; left: 50%; transform: translateX(-50%) translateY(-160px); background: rgba(10,10,25,0.95); border: 2px solid var(--glass-border); padding: 18px 28px; border-radius: 20px; font-weight: 800; font-size: 15px; transition: transform 0.3s ease, opacity 0.3s ease; opacity: 0; z-index: 1000; pointer-events: none; max-width: 90%; text-align: center; }
+  /* Нижняя навигация */
+  .nav { 
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
+    background: rgba(10, 10, 20, 0.85); border: 1px solid var(--glass-border); 
+    border-radius: 30px; padding: 10px 12px; display: flex; gap: 6px; z-index: 100; 
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1); 
+    max-width: calc(100% - 24px); backdrop-filter: blur(20px); 
+  }
+  .nav-btn { 
+    background: transparent; border: none; color: var(--text-dim); padding: 10px 14px; 
+    border-radius: 20px; font-size: 10px; font-weight: 800; font-family: 'Inter', sans-serif; 
+    cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px; 
+    min-width: 60px; transition: 0.2s; 
+  }
+  .nav-btn .nav-icon { font-size: 22px; filter: grayscale(1) opacity(0.7); transition: 0.2s; }
+  .nav-btn.active { color: #fff; background: rgba(255,255,255,0.1); }
+  .nav-btn.active .nav-icon { filter: grayscale(0) opacity(1); transform: translateY(-2px); }
+  
+  /* Тост (Уведомление) */
+  .toast { 
+    position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); 
+    background: rgba(10, 10, 20, 0.95); border: 1px solid var(--glass-border); 
+    padding: 18px 28px; border-radius: 20px; font-weight: 800; font-size: 15px; 
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); opacity: 0; z-index: 1000; 
+    pointer-events: none; max-width: 90%; text-align: center; backdrop-filter: blur(20px); 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
   .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-  .toast.success { border-color: rgba(16,185,129,0.8); }
-  .toast.error { border-color: rgba(239,68,68,0.8); }
+  .toast.success { border-color: rgba(0, 245, 212, 0.8); box-shadow: 0 0 20px rgba(0, 245, 212, 0.3); }
+  .toast.error { border-color: rgba(255, 0, 127, 0.8); box-shadow: 0 0 20px rgba(255, 0, 127, 0.3); }
+
+  .shared-balance-note { margin-top: 24px; text-align: center; font-size: 12px; color: var(--text-dim); font-weight: 700; padding: 16px 20px; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 16px; backdrop-filter: blur(10px); }
 </style>
 </head>
 <body>
 
+<!-- Фоновые эффекты -->
+<div class="bg-blobs">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+</div>
+
+<!-- Главный экран (Приветствие) -->
 <div id="screen-main" class="screen active">
-  <div class="header"><h1>Byrat Shop</h1><p>✦ Premium Store ✦</p></div>
+  <div class="header" style="margin-top: 100px;">
+    <h1>Byrat Shop</h1>
+    <p>✦ Premium Store ✦</p>
+  </div>
   <button class="btn btn-hero" onclick="showScreen('screen-menu')">
     <div class="btn-text">
       <span class="btn-title">НАЧАТЬ</span>
-      <span class="btn-sub" style="color: rgba(255,255,255,0.9);">ОТКРЫТЬ МАГАЗИН</span>
+      <span class="btn-sub">ОТКРЫТЬ МАГАЗИН</span>
     </div>
   </button>
+  <div class="shared-balance-note" style="margin-top: auto;">Нажми «Начать», чтобы перейти в каталог</div>
 </div>
 
+<!-- Меню (Выбор категорий) -->
 <div id="screen-menu" class="screen">
-  <div class="header"><h1>Магазин</h1><p>Выбери категорию</p></div>
-  <div class="categories">
-    <div class="category tg" onclick="showScreen('screen-shop-tg')">
+  <div class="header">
+    <h1>Меню</h1>
+    <p>Выбери раздел</p>
+  </div>
+  
+  <div style="display: flex; gap: 16px; margin-bottom: 20px;">
+    <div class="category tg" style="flex: 1; padding: 24px 12px; min-height: 180px;" onclick="showScreen('screen-shop-tg')">
       <div class="category-icon">📱</div>
-      <div class="category-title">Аккаунты<br>TG</div>
+      <div class="category-title">Аккаунты TG</div>
       <div class="category-sub">TData + Auth Key</div>
     </div>
-    <div class="category dota" onclick="showScreen('screen-shop-dota')">
+    <div class="category dota" style="flex: 1; padding: 24px 12px; min-height: 180px;" onclick="showScreen('screen-shop-dota')">
       <div class="category-icon">🎮</div>
-      <div class="category-title">Сетки<br>Dota</div>
+      <div class="category-title">Сетки Dota</div>
       <div class="category-sub">CFG из фото</div>
     </div>
   </div>
+
   <div class="shared-balance-note">⭐ Баланс общий для аккаунтов и сеток доты</div>
 </div>
 
+<!-- Аккаунты TG -->
 <div id="screen-shop-tg" class="screen">
-  <div class="header"><h1>Аккаунты TG</h1><p>Доступные аккаунты</p></div>
+  <div class="header"><h1>Аккаунты TG</h1><p>Доступные страны</p></div>
 
   <div class="shop-item" onclick="buy('usa')">
     <div class="shop-flag"><img src="https://flagcdn.com/w80/us.png" alt="US"></div>
@@ -188,37 +308,41 @@
     <div class="shop-price">120 ⭐</div>
   </div>
 
+  <!-- Анонимный аккаунт за 1000 звезд -->
   <div class="shop-item vip" onclick="buy('vip')">
     <div class="shop-flag">🏴‍☠️</div>
     <div class="shop-info"><div class="shop-name">Анонимный</div><div class="shop-code">+888</div></div>
-    <div class="shop-price">500 ⭐</div>
+    <div class="shop-price">1000 ⭐</div>
   </div>
 
-  <button class="back-btn" onclick="showScreen('screen-menu')">← Назад</button>
+  <button class="back-btn" onclick="showScreen('screen-menu')">← В меню</button>
 </div>
 
+<!-- Сетки Дота -->
 <div id="screen-shop-dota" class="screen">
-  <div class="header"><h1>Сетки Dota</h1><p>CFG из твоего фото</p></div>
+  <div class="header"><h1>Сетки Dota 2</h1><p>CFG из твоего фото</p></div>
   <div class="dota-card">
     <div class="dota-icon">🎨</div>
     <div class="dota-title">CFG-сетка из фото</div>
-    <div class="dota-desc">Получи редактор, сделай сетку из своего фото и закинь в Dota 2</div>
+    <div class="dota-desc">Получи редактор, сделай уникальную сетку из своего фото и установи в Dota 2</div>
     <div class="dota-price">150 ⭐</div>
     <button class="dota-buy" onclick="buyCfg()">ЗАКАЗАТЬ</button>
   </div>
-  <button class="back-btn" onclick="showScreen('screen-menu')">← Назад</button>
+  <button class="back-btn" onclick="showScreen('screen-menu')">← В меню</button>
 </div>
 
+<!-- Баланс -->
 <div id="screen-balance" class="screen">
-  <div class="header"><h1>Баланс</h1><p>Общий счёт</p></div>
+  <div class="header"><h1>Баланс</h1><p>Твой счёт</p></div>
   <div class="balance-card">
     <div class="balance-label">Доступно</div>
     <div class="balance-num" id="balance-display">0<span class="balance-star">⭐</span></div>
   </div>
-  <div class="shared-balance-note">⭐ Баланс общий для аккаунтов и сеток</div>
-  <button class="back-btn" onclick="showScreen('screen-menu')">← Назад</button>
+  <div class="shared-balance-note">⭐ Баланс общий для всех товаров</div>
+  <button class="back-btn" onclick="showScreen('screen-menu')">← В меню</button>
 </div>
 
+<!-- Пополнение -->
 <div id="screen-topup" class="screen">
   <div class="header"><h1>Пополнение</h1><p>Выбери сумму</p></div>
   <div class="topup-grid">
@@ -229,36 +353,40 @@
     <button class="topup-btn" onclick="payStars(150)"><span class="topup-amount">150</span><span class="topup-star">⭐</span></button>
     <button class="topup-btn" onclick="payStars(300)"><span class="topup-amount">300</span><span class="topup-star">⭐</span></button>
   </div>
-  <button class="btn" onclick="showScreen('screen-promo')" style="justify-content: center; background: rgba(251,191,36,0.15); border-color: rgba(251,191,36,0.5);">
-    <div class="btn-text" style="align-items: center;"><span class="btn-title">🎁 Пополнить промокодом</span></div>
+  <button class="btn" onclick="showScreen('screen-promo')" style="justify-content: center; background: rgba(254, 228, 64, 0.15); border-color: rgba(254, 228, 64, 0.4); margin-top: 10px;">
+    <div class="btn-text" style="align-items: center;"><span class="btn-title" style="color: var(--gold);">🎁 Ввести промокод</span></div>
   </button>
-  <button class="back-btn" onclick="showScreen('screen-menu')">← Назад</button>
+  <button class="back-btn" onclick="showScreen('screen-menu')">← В меню</button>
 </div>
 
+<!-- Промокоды -->
 <div id="screen-promo" class="screen">
-  <div class="header"><h1>Промокод</h1><p>Введи код</p></div>
+  <div class="header"><h1>Промокод</h1><p>Активируй бонус</p></div>
   <input type="text" id="promo-input" class="promo-input" placeholder="КОД" maxlength="20">
-  <button class="btn" onclick="activatePromo()" style="justify-content: center; background: linear-gradient(135deg, #8b5cf6, #d946ef); border: none;">
+  <button class="btn" onclick="activatePromo()" style="justify-content: center; background: linear-gradient(135deg, var(--accent-1), var(--accent-2)); border: none; box-shadow: 0 10px 25px rgba(255, 0, 127, 0.3);">
     <div class="btn-text" style="align-items: center;"><span class="btn-title">✅ АКТИВИРОВАТЬ</span></div>
   </button>
-  <button class="back-btn" onclick="showScreen('screen-menu')">← Назад</button>
+  <button class="back-btn" onclick="showScreen('screen-topup')">← Назад к пополнению</button>
 </div>
 
+<!-- Помощь -->
 <div id="screen-help" class="screen">
   <div class="header"><h1>Помощь</h1><p>Связаться с нами</p></div>
   <div class="help-card">
-    <div style="font-size: 56px; margin-bottom: 16px;">💬</div>
-    <div style="font-size: 15px; color: var(--text-dim); margin-bottom: 12px;">По всем вопросам пишите</div>
+    <div style="font-size: 60px; margin-bottom: 20px; filter: drop-shadow(0 0 20px rgba(0,245,212,0.5));">💬</div>
+    <div style="font-size: 14px; color: var(--text-dim); margin-bottom: 8px; font-weight: 600;">По всем вопросам пишите</div>
     <a href="https://t.me/ownerByrat_Shop" target="_blank" class="help-link">@ownerByrat_Shop</a>
   </div>
-  <button class="back-btn" onclick="showScreen('screen-menu')">← Назад</button>
+  <button class="back-btn" onclick="showScreen('screen-menu')">← В меню</button>
 </div>
 
+<!-- Нижняя навигация (6 кнопок) -->
 <div class="nav" id="nav" style="display: none;">
-  <button class="nav-btn" data-screen="screen-menu" onclick="showScreen('screen-menu')"><span class="nav-icon">🏠</span><span>Главная</span></button>
+  <button class="nav-btn" data-screen="screen-menu" onclick="showScreen('screen-menu')"><span class="nav-icon">🏠</span><span>Меню</span></button>
   <button class="nav-btn" data-screen="screen-shop-tg" onclick="showScreen('screen-shop-tg')"><span class="nav-icon">📱</span><span>TG</span></button>
   <button class="nav-btn" data-screen="screen-shop-dota" onclick="showScreen('screen-shop-dota')"><span class="nav-icon">🎮</span><span>Dota</span></button>
   <button class="nav-btn" data-screen="screen-balance" onclick="showScreen('screen-balance')"><span class="nav-icon">💰</span><span>Баланс</span></button>
+  <button class="nav-btn" data-screen="screen-topup" onclick="showScreen('screen-topup')"><span class="nav-icon">➕</span><span>Пополнить</span></button>
   <button class="nav-btn" data-screen="screen-help" onclick="showScreen('screen-help')"><span class="nav-icon">❓</span><span>Помощь</span></button>
 </div>
 
@@ -268,24 +396,27 @@
   Telegram.WebApp.ready();
   Telegram.WebApp.expand();
 
+  // ВАЖНО: Здесь твой URL воркера (мы его проверили, он работает)
   var API_BASE = "https://my-telegram-bot.kakebeska.workers.dev";
+  
   var urlParams = new URLSearchParams(window.location.search);
   var userId = urlParams.get('user_id') || (Telegram.WebApp.initDataUnsafe.user ? Telegram.WebApp.initDataUnsafe.user.id : null);
 
-  var symbols = ["$", "⭐", "💎", "✦"];
-  var colors = ["#10b981", "#fbbf24", "#22d3ee", "#d946ef"];
-  for (var i = 0; i < 5; i++) {
+  // Генерация красивых частиц на фоне
+  var symbols = ["⭐", "💎", "✨", "🔥"];
+  var colors = ["#fee440", "#00f5d4", "#9d4edd", "#ff007f"];
+  for (var i = 0; i < 15; i++) {
     var p = document.createElement('div');
     p.className = 'particle';
     p.textContent = symbols[Math.floor(Math.random() * symbols.length)];
     p.style.color = colors[Math.floor(Math.random() * colors.length)];
     p.style.left = Math.random() * 100 + '%';
     p.style.top = Math.random() * 100 + 'vh';
-    p.style.fontSize = (12 + Math.random() * 18) + 'px';
-    var dur = 10 + Math.random() * 15;
+    p.style.fontSize = (10 + Math.random() * 20) + 'px';
+    var dur = 12 + Math.random() * 15;
     p.style.animationDuration = dur + 's';
     p.style.animationDelay = '-' + (Math.random() * dur) + 's';
-    p.style.opacity = 0.3 + Math.random() * 0.5;
+    p.style.opacity = 0.2 + Math.random() * 0.4;
     document.body.appendChild(p);
   }
 
@@ -318,11 +449,15 @@
     var display = document.getElementById('balance-display');
     display.innerHTML = '...<span class="balance-star">⭐</span>';
     if (!userId) { display.innerHTML = '0<span class="balance-star">⭐</span>'; return; }
+    
     var xhr = new XMLHttpRequest();
     xhr.open('GET', API_BASE + '/api/balance?user_id=' + userId, true);
     xhr.timeout = 8000;
     xhr.onload = function() {
-      try { var data = JSON.parse(xhr.responseText); display.innerHTML = data.balance + '<span class="balance-star">⭐</span>'; }
+      try { 
+        var data = JSON.parse(xhr.responseText); 
+        display.innerHTML = data.balance + '<span class="balance-star">⭐</span>'; 
+      }
       catch (e) { display.innerHTML = '0<span class="balance-star">⭐</span>'; }
     };
     xhr.onerror = function() { display.innerHTML = '0<span class="balance-star">⭐</span>'; };
@@ -334,11 +469,16 @@
     var input = document.getElementById('promo-input');
     var code = input.value.trim();
     if (!code) { showToast('Введи промокод', 'error'); return; }
+    
     var xhr = new XMLHttpRequest();
     xhr.open('GET', API_BASE + '/api/promo?user_id=' + userId + '&code=' + encodeURIComponent(code), true);
     xhr.timeout = 8000;
     xhr.onload = function() {
-      try { var data = JSON.parse(xhr.responseText); showToast(data.message, data.ok ? 'success' : 'error'); if (data.ok) { input.value = ''; loadBalance(); } }
+      try { 
+        var data = JSON.parse(xhr.responseText); 
+        showToast(data.message, data.ok ? 'success' : 'error'); 
+        if (data.ok) { input.value = ''; } 
+      }
       catch (e) { showToast('Ошибка ответа', 'error'); }
     };
     xhr.onerror = function() { showToast('Ошибка соединения', 'error'); };
